@@ -1,46 +1,94 @@
-<mat-stepper linear="false" #stepper>
+<mat-stepper linear="true" #stepper>
   <mat-step [stepControl]="infoDivida">
     <form [formGroup]="infoDivida">
       <div class="container-input">
+
         <ng-template matStepLabel>Informações</ng-template>
         <h2 class="label">Valor da dívida:</h2>
-        <mat-form-field appearance="outline">
-        <span matTextPrefix>R$ </span>
-          <input matInput formControlName="valor" required>
-          <mat-hint align="start">Apenas valores numericos</mat-hint>
-        </mat-form-field>
+        <div class="data">
+          <mat-form-field appearance="outline">
+            <span matTextPrefix>R$ &nbsp;</span>
+            <input matInput formControlName="valor" required [specialCharacters]="[ ',', '.' ]" mask="separator.5"
+              thousandSeparator="." placeholder="Valor em reais">
+            <mat-hint align="start">Use vírgula para os centavos</mat-hint>
+            @if (!infoDivida.hasError('required')) {
+            <mat-error>Insira um valor válido!</mat-error>
+            }
+          </mat-form-field>
 
+        </div>
       </div>
+
 
       <div class="container-input">
         <ng-template matStepLabel>Informações</ng-template>
         <h2 class="label">Data de início:</h2>
-        <mat-form-field appearance="outline">
-          <mat-label>Mês e Ano</mat-label>
-          <input matInput [matDatepicker]="dp" formControlName="dataInicial">
-          <mat-hint>MM/AAAA</mat-hint>
-          <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
-          <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)">
-          </mat-datepicker>
+        <div class="data">
+          <mat-form-field appearance="outline">
+            <mat-select placeholder="Selecione o mês" formControlName="mesInicial">
+              @for (mes of meses; track mes) {
+              <mat-option [value]="mes.valor">{{mes.nome}}</mat-option>
+              }
+            </mat-select>
+            @if (!infoDivida.hasError('required')) {
+            <mat-error>Insira o mês!</mat-error>
+            }
 
-        </mat-form-field>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-select placeholder="Selecione o ano" formControlName="anoInicial">
+              @for (ano of anos; track ano) {
+              <mat-option [value]="ano">{{ano}}</mat-option>
+              }
+            </mat-select>
+            @if (!infoDivida.hasError('required')) {
+            <mat-error>Insira o ano!</mat-error>
+            }
+            
+
+          </mat-form-field>
+          
+        </div>
       </div>
+
 
       <div class="container-input">
         <ng-template matStepLabel>Informações</ng-template>
         <h2 class="label">Data de término:</h2>
-        <mat-form-field appearance="outline">
-          <mat-label>Mês e Ano</mat-label>
-          <input matInput [matDatepicker]="dp" formControlName="dataFinal">
-          <mat-hint>MM/AAAA</mat-hint>
-          <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
-          
+        <div class="data">
+          <mat-form-field appearance="outline">
+            <mat-select placeholder="Selecione o mês" formControlName="mesFinal">
+              @for (mes of meses; track mes) {
+              <mat-option [value]="mes.valor">{{mes.nome}}</mat-option>
+              }
+            </mat-select>
+            @if (!infoDivida.hasError('required')) {
+            <mat-error>Insira o mês!</mat-error>
+            }
 
-        </mat-form-field>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-select placeholder="Selecione o ano" formControlName="anoFinal">
+              @for (ano of anos; track ano) {
+              <mat-option [value]="ano">{{ano}}</mat-option>
+              }
+            </mat-select>
+
+            @if (!infoDivida.hasError('required')) {
+            <mat-error>Insira o ano!</mat-error>
+            }
+
+          </mat-form-field>
+        </div>
       </div>
 
-      <div>
-        <button mat-button matStepperNext>Calcular</button>
+
+
+      <div class="bnt">
+        <button matStepperNext class="bnt-calcular">Calcular</button>
+        <button class="bnt-limpar">Limpar</button>
       </div>
     </form>
   </mat-step>

@@ -4,17 +4,63 @@
 
 
 
-form{
+form {
     display: flex;
-    justify-content: center;
     align-items: center;
     flex-direction: column;
+    margin: 1rem;
 
-    .container-input{
+    .container-input {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
-        width: 50%;
+        justify-content: space-around;
+        width: 80%;
         margin: .5rem 0 .5rem 0;
+
+        .label {
+            width: 40%;
+        }
+
+
+        .data {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 60%;
+
+            mat-form-field {
+                margin: 0 .5rem 0 .5rem;
+            }
+        }
+
+    }
+}
+
+.bnt {
+    display: flex;
+    justify-content: right;
+    margin-top: 1.5rem;
+    width: 100%;
+
+    .bnt-calcular {
+        border-radius: .5rem;
+        background-color: #01426A;
+        color: #ffffff;
+        margin-right: 1rem;
+        margin: .6rem;
+        padding: .6rem;
+        cursor: pointer;
+    }
+
+    .bnt-limpar {
+        background-color: transparent;
+        border: solid #01426A .15rem;
+        color: #01426A;
+        border-radius: .5rem;
+        margin: .6rem;
+        padding: .6rem;
+                cursor: pointer;
+
+
     }
 }

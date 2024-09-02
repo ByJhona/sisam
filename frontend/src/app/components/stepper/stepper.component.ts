@@ -1,54 +1,67 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {  Component, inject } from '@angular/core';
 import { FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
-import {MatDatepicker, MatDatepickerModule} from '@angular/material/datepicker';
-import { MAT_DATE_FORMATS  } from '@angular/material/core';
-import {MatMomentDateModule, provideMomentDateAdapter} from '@angular/material-moment-adapter';
-import moment, { Moment } from 'moment';
+import {MatSelectModule} from '@angular/material/select';
+import { NgxMaskDirective } from 'ngx-mask';
 
 
 
-// See the Moment.js docs for the meaning of these formats:
-// https://momentjs.com/docs/#/displaying/format/
-export const MY_FORMATS = {
-  parse: {
-    dateInput: 'MM/YYYY',
-  },
-  display: {
-    dateInput: 'MM/YYYY',
-    monthYearLabel: 'MMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY',
-  },
-};
 
 
 
 @Component({
   selector: 'app-stepper',
   standalone: true,
-  providers:[provideMomentDateAdapter(MY_FORMATS )],
   imports: [MatButtonModule,
     MatStepperModule,
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatInputModule,MatFormFieldModule, MatInputModule, MatDatepickerModule, MatMomentDateModule],
-      changeDetection: ChangeDetectionStrategy.OnPush,
+    MatInputModule,MatFormFieldModule, MatInputModule, MatSelectModule, NgxMaskDirective],
 
   templateUrl: './stepper.component.html',
   styleUrl: './stepper.component.scss'
 })
 export class StepperComponent {
+
+  
   private _formBuilder = inject(FormBuilder);
+  meses = [
+  {"nome": "Janeiro", "valor": 1},
+  {"nome": "Fevereiro", "valor": 2},
+  {"nome": "Março", "valor": 3},
+  {"nome": "Abril", "valor": 4},
+  {"nome": "Maio", "valor": 5},
+  {"nome": "Junho", "valor": 6},
+  {"nome": "Julho", "valor": 7},
+  {"nome": "Agosto", "valor": 8},
+  {"nome": "Setembro", "valor": 9},
+  {"nome": "Outubro", "valor": 10},
+  {"nome": "Novembro", "valor": 11},
+  {"nome": "Dezembro", "valor": 12}
+]
+  anos: number[] = []
+
+  gerarAnos(): number[]{
+    var dataAtual = new Date();
+    var anoAtual = dataAtual.getFullYear();
+    var anosGerados: number[] = []
+    for(var i=1994;i<= anoAtual; i++){
+      anosGerados.push(i);
+    }
+    return anosGerados;
+  }
+
 
   infoDivida = this._formBuilder.group({
     valor: ['', Validators.required],
-    dataInicial: ['', Validators.required],
-    dataFinal: ['', Validators.required]
+    mesInicial: ['', Validators.required],
+    anoInicial: ['', Validators.required],
+    mesFinal: ['', Validators.required],
+    anoFinal: ['', Validators.required]
   });
   secondFormGroup = this._formBuilder.group({
     secondCtrl: ['', Validators.required],
@@ -56,12 +69,8 @@ export class StepperComponent {
 
   isLinear = false;
 
-  setMonthAndYear(normalizedMonthAndYear: Moment, datepicker: MatDatepicker<Moment>) {
-    const ctrlValue = this.infoDivida.get("dataInicial")?.value ?? moment();
-    ctrlValue.month(normalizedMonthAndYear.month());
-    ctrlValue.year(normalizedMonthAndYear.year());
-    this.infoDivida.controls.dataInicial.setValue(ctrlValue);
-    console.log(this.infoDivida)
-    datepicker.close();
+  
+  ngOnInit():void{
+    this.anos = this.gerarAnos();
   }
 }
