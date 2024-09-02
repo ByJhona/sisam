@@ -1,23 +1,68 @@
+<mat-stepper linear="false" #stepper>
+  <mat-step [stepControl]="infoDivida">
+    <form [formGroup]="infoDivida">
+      <div class="container-input">
+        <ng-template matStepLabel>Informações</ng-template>
+        <h2 class="label">Valor da dívida:</h2>
+        <mat-form-field appearance="outline">
+        <span matTextPrefix>R$ </span>
+          <input matInput formControlName="valor" required>
+          <mat-hint align="start">Apenas valores numericos</mat-hint>
+        </mat-form-field>
 
-<mat-stepper linear="true" #stepper>
-  <mat-step [stepControl]="firstFormGroup">
-    <form [formGroup]="firstFormGroup">
-      <ng-template matStepLabel>Selecione a sua dívida</ng-template>
-      <mat-form-field>
-        <mat-label>Name</mat-label>
-        <input matInput placeholder="Last name, First name" formControlName="firstCtrl" required>
-      </mat-form-field>
+      </div>
+
+      <div class="container-input">
+        <ng-template matStepLabel>Informações</ng-template>
+        <h2 class="label">Data de início:</h2>
+        <mat-form-field appearance="outline">
+          <mat-label>Mês e Ano</mat-label>
+          <input matInput [matDatepicker]="dp" formControlName="dataInicial">
+          <mat-hint>MM/AAAA</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+          <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)">
+          </mat-datepicker>
+
+        </mat-form-field>
+      </div>
+
+      <div class="container-input">
+        <ng-template matStepLabel>Informações</ng-template>
+        <h2 class="label">Data de término:</h2>
+        <mat-form-field appearance="outline">
+          <mat-label>Mês e Ano</mat-label>
+          <input matInput [matDatepicker]="dp" formControlName="dataFinal">
+          <mat-hint>MM/AAAA</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
+          
+
+        </mat-form-field>
+      </div>
+
       <div>
-        <button mat-button matStepperNext>Next</button>
+        <button mat-button matStepperNext>Calcular</button>
       </div>
     </form>
   </mat-step>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   <mat-step [stepControl]="secondFormGroup" label="Índices">
     <form [formGroup]="secondFormGroup">
       <mat-form-field>
         <mat-label>Address</mat-label>
-        <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY"
-               required>
+        <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY" required>
       </mat-form-field>
       <div>
         <button mat-button matStepperPrevious>Back</button>
@@ -26,7 +71,7 @@
     </form>
   </mat-step>
   <mat-step>
-    <ng-template matStepLabel>Resultado</ng-template>
+    <ng-template matStepLabel>Gerar Relatório</ng-template>
     <p>You are now done.</p>
     <div>
       <button mat-button matStepperPrevious>Back</button>

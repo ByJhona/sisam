@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { FormularioComponent } from "../../components/formulario/formulario.component";
 import { StepperComponent } from "../../components/stepper/stepper.component";
+import { CabecalhoComponent } from "../../components/cabecalho/cabecalho.component";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormularioComponent, StepperComponent],
+  imports: [FormularioComponent, StepperComponent, CabecalhoComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })

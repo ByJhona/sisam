@@ -1,0 +1,20 @@
+.label {
+    font-size: 1rem;
+}
+
+
+
+form{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    .container-input{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 50%;
+        margin: .5rem 0 .5rem 0;
+    }
+}
