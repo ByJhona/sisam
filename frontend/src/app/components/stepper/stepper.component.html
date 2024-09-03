@@ -1,6 +1,6 @@
 <mat-stepper linear="true" #stepper>
   <mat-step [stepControl]="infoDivida">
-    <form [formGroup]="infoDivida">
+    <form [formGroup]="infoDivida" (ngSubmit)="onSubmit(stepper)">
       <div class="container-input">
 
         <ng-template matStepLabel>Informações</ng-template>
@@ -45,10 +45,10 @@
             @if (!infoDivida.hasError('required')) {
             <mat-error>Insira o ano!</mat-error>
             }
-            
+
 
           </mat-form-field>
-          
+
         </div>
       </div>
 
@@ -76,9 +76,12 @@
               }
             </mat-select>
 
-            @if (!infoDivida.hasError('required')) {
+            @if (infoDivida.hasError('dataFinalMenor')) {
+            <mat-error>Data de término menor que inicial!</mat-error>
+            }@else if(!infoDivida.hasError('required')){
             <mat-error>Insira o ano!</mat-error>
             }
+            
 
           </mat-form-field>
         </div>
@@ -87,8 +90,8 @@
 
 
       <div class="bnt">
-        <button matStepperNext class="bnt-calcular">Calcular</button>
-        <button class="bnt-limpar">Limpar</button>
+        <button class="bnt-calcular" type="submit">Calcular</button>
+        <button class="bnt-limpar" (click)="limparCampos()">Limpar</button>
       </div>
     </form>
   </mat-step>
@@ -123,7 +126,7 @@
     <p>You are now done.</p>
     <div>
       <button mat-button matStepperPrevious>Back</button>
-      <button mat-button (click)="stepper.reset()">Reset</button>
+      <button mat-button (click)="limparCampos()">Reset</button>
     </div>
   </mat-step>
 </mat-stepper>
