@@ -1,6 +1,6 @@
 <mat-stepper linear="true" #stepper>
   <mat-step [stepControl]="infoDivida">
-    <form [formGroup]="infoDivida" (ngSubmit)="onSubmit(stepper)">
+    <form [formGroup]="infoDivida">
       <div class="container-input">
 
         <ng-template matStepLabel>Informações</ng-template>
@@ -8,7 +8,7 @@
         <div class="data">
           <mat-form-field appearance="outline">
             <span matTextPrefix>R$ &nbsp;</span>
-            <input matInput formControlName="valor" required [specialCharacters]="[ ',', '.' ]" mask="separator.5"
+            <input matInput formControlName="valor" required [specialCharacters]="[ ',', '.' ]" mask="separator.2"
               thousandSeparator="." placeholder="Valor em reais">
             <mat-hint align="start">Use vírgula para os centavos</mat-hint>
             @if (!infoDivida.hasError('required')) {
@@ -18,7 +18,6 @@
 
         </div>
       </div>
-
 
       <div class="container-input">
         <ng-template matStepLabel>Informações</ng-template>
@@ -46,12 +45,10 @@
             <mat-error>Insira o ano!</mat-error>
             }
 
-
           </mat-form-field>
 
         </div>
       </div>
-
 
       <div class="container-input">
         <ng-template matStepLabel>Informações</ng-template>
@@ -77,20 +74,15 @@
             </mat-select>
 
             @if (infoDivida.hasError('dataFinalMenor')) {
-            <mat-error>Data de término menor que inicial!</mat-error>
+            <mat-error>Data final inválida!</mat-error>
             }@else if(!infoDivida.hasError('required')){
             <mat-error>Insira o ano!</mat-error>
             }
-            
-
           </mat-form-field>
         </div>
       </div>
-
-
-
       <div class="bnt">
-        <button class="bnt-calcular" type="submit">Calcular</button>
+        <button class="bnt-calcular" (click)="onSubmit(stepper)" type="submit">Calcular</button>
         <button class="bnt-limpar" (click)="limparCampos()">Limpar</button>
       </div>
     </form>
@@ -110,17 +102,13 @@
 
 
   <mat-step [stepControl]="secondFormGroup" label="Índices">
-    <form [formGroup]="secondFormGroup">
-      <mat-form-field>
-        <mat-label>Address</mat-label>
-        <input matInput formControlName="secondCtrl" placeholder="Ex. 1 Main St, New York, NY" required>
-      </mat-form-field>
-      <div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button matStepperNext>Next</button>
-      </div>
-    </form>
+
+
+    <app-tabela></app-tabela>
+
   </mat-step>
+
+
   <mat-step>
     <ng-template matStepLabel>Gerar Relatório</ng-template>
     <p>You are now done.</p>
