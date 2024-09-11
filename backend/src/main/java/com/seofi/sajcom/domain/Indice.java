@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Setter
 @Getter
@@ -15,13 +14,11 @@ public class Indice {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(name = "valor")
-    float valor;
     @Column(name = "data")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    Date data;
-
-
+    LocalDate data;
+    @Column(name = "valor")
+    float valor;
 
     @Override
     public String toString() {

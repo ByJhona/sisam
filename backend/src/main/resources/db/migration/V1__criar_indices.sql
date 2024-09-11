@@ -1,7 +1,9 @@
 create table indices(
     id serial not null,
-    valor double precision not null,
-    data  date not null,
+    data  date not null unique,
+    valor real not null,
+
+
 
     primary key(id)
     );

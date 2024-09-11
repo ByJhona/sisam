@@ -24,10 +24,9 @@ public class CalculadoraController {
 
         System.out.println(divida.getValor());
         System.out.println(divida.getDataInicial());
-        List<Indice> indices = this.api.getIndice();
+        this.api.filtrarIndicesSelic();
 
-        indices.forEach(System.out::println);
-        indiceRepository.saveAll(indices);
+
 
         return ResponseEntity.ok().body(divida);
     }
