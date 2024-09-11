@@ -7,12 +7,11 @@ import { Divida } from '../types/divida';
   providedIn: 'root'
 })
 export class CalculadoraAPIService {
-  private url = 'http://localhost:8080/'
+  private url = 'http://localhost:8080'
 
   constructor(private http:HttpClient) { }
 
   enviarDados(dados : Divida):Observable<Divida>{
-    return this.http.post<Divida>(this.url + 'calcular', dados)
+    return this.http.post<Divida>(this.url + '/calcular', dados)
   }
-
 }
