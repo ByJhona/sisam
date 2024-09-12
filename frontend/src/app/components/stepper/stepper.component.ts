@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { FormBuilder, Validators, FormsModule, ReactiveFormsModule, ValidatorFn, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,6 +9,11 @@ import { NgxMaskDirective } from 'ngx-mask';
 import { TabelaComponent } from "../tabela/tabela.component";
 import { Divida } from '../../types/divida';
 import { CalculadoraAPIService } from '../../service/calculadora-api.service';
+import { Resultado } from '../../types/resultado';
+import { Indice } from '../../types/Indice';
+import { Observable } from 'rxjs';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
 
 
 
@@ -22,14 +27,14 @@ import { CalculadoraAPIService } from '../../service/calculadora-api.service';
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatInputModule, MatFormFieldModule, MatInputModule, MatSelectModule, NgxMaskDirective, TabelaComponent],
+    MatInputModule, MatFormFieldModule, MatInputModule, MatSelectModule, NgxMaskDirective, TabelaComponent, MatTableModule, MatPaginator],
 
   templateUrl: './stepper.component.html',
   styleUrl: './stepper.component.scss'
 })
 export class StepperComponent {
 
-  constructor(private calculadoraService: CalculadoraAPIService){
+  constructor(private calculadoraService: CalculadoraAPIService) {
 
   }
 
@@ -50,6 +55,17 @@ export class StepperComponent {
   ]
   anoInicial: number = 1994
   anos: number[] = []
+  resultApi!: Observable<Resultado>
+  valorTotal!: number
+  indices!: Indice[]
+  displayedColumns: string[] = ['data', 'valor'];
+  dataSource  = new MatTableDataSource<Indice>();
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+  ngAfterViewInit(){
+    this.dataSource.paginator = this.paginator;
+  }
+
 
   infoDivida = this._formBuilder.group({
     valor: ['', Validators.required],
@@ -59,46 +75,18 @@ export class StepperComponent {
     anoFinal: ['', [Validators.required]]
   }, { validators: this.dataFinalMenorDataFinal() });
 
-
-  secondFormGroup = this._formBuilder.group({
-    secondCtrl: [0, Validators.required],
-  });
-
-
   limparCampos(): void {
     this.infoDivida.reset({ valor: '', mesInicial: '', anoFinal: '', mesFinal: '', anoInicial: '' })
   }
 
   onSubmit(stepper: MatStepper) {
+    var isValido: boolean = this.validarDivida();
 
-    
-    if (this.infoDivida.valid) { // Se o formulario estiver válido...
-      var valor = Number(this.infoDivida.get('valor')?.value);
-      var mesInicial = Number(this.infoDivida.get('mesInicial')?.value);
-      var anoInicial = Number(this.infoDivida.get('anoInicial')?.value);
-      var mesFinal = Number(this.infoDivida.get('mesFinal')?.value);
-      var anoFinal = Number(this.infoDivida.get('anoFinal')?.value);
-      var dataInicial = new Date(anoInicial, mesInicial - 1);
-      var dataFinal = new Date(anoFinal, mesFinal - 1)
-
-
-
-      var divida: Divida = {
-        valor: valor,
-        dataInicial: dataInicial,
-        dataFinal: dataFinal
-      }
-      this.calculadoraService.enviarDados(divida).subscribe()
-
-
-      console.log(divida)
-      stepper.next()
-
-    }else{
-      alert("Dados informados inválidos!")
+    if (isValido) {
+      var divida: Divida = this.construirObjetoDivida();
+      this.enviarApi(divida);
+      stepper.next();
     }
-
-
   }
 
   dataFinalMenorDataFinal(): ValidatorFn {
@@ -128,12 +116,44 @@ export class StepperComponent {
     for (var i = this.anoInicial; i <= anoAtual; i++) {
       anosGerados.push(i);
     }
-    return anosGerados;
+    return anosGerados.sort((a, b) => { return b - a });
   }
-
-
 
   ngOnInit(): void {
     this.anos = this.gerarAnos();
+  }
+
+  validarDivida(): boolean {
+    if (this.infoDivida.valid) { // Se o formulario estiver válido...
+      return true;
+    } else {
+      // Criar modal de alerta
+      alert("Dados informados inválidos!")
+      return false;
+    }
+  }
+
+  construirObjetoDivida(): Divida {
+    var valor = Number(this.infoDivida.get('valor')?.value);
+    var mesInicial = Number(this.infoDivida.get('mesInicial')?.value);
+    var anoInicial = Number(this.infoDivida.get('anoInicial')?.value);
+    var mesFinal = Number(this.infoDivida.get('mesFinal')?.value);
+    var anoFinal = Number(this.infoDivida.get('anoFinal')?.value);
+    var dataInicial = new Date(anoInicial, mesInicial - 1);
+    var dataFinal = new Date(anoFinal, mesFinal - 1)
+
+    var divida: Divida = {
+      valor: valor,
+      dataInicial: dataInicial,
+      dataFinal: dataFinal
+    }
+
+    return divida;
+  }
+
+  enviarApi(divida: Divida): void {
+    this.calculadoraService.enviarDados(divida).subscribe((result) => {
+      this.dataSource.data = result.indices
+    })
   }
 }

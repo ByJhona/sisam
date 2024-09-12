@@ -101,10 +101,29 @@
 
 
 
-  <mat-step [stepControl]="secondFormGroup" label="Índices">
+  <mat-step label="Índices">
+
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
 
-    <app-tabela></app-tabela>
+    <!-- Name Column -->
+    <ng-container matColumnDef="data">
+      <th mat-header-cell *matHeaderCellDef> Data </th>
+      <td mat-cell *matCellDef="let element"> {{element.data}} </td>
+    </ng-container>
+
+    <!-- Weight Column -->
+    <ng-container matColumnDef="valor">
+      <th mat-header-cell *matHeaderCellDef> Valor </th>
+      <td mat-cell *matCellDef="let element"> {{element.valor}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <mat-paginator  [pageSizeOptions]="[5, 10]"></mat-paginator>
+
+
 
   </mat-step>
 
