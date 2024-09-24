@@ -5,5 +5,5 @@ import java.util.List;
 
 public record DividaDTO(
         float valor,
-        List<IndiceDTO> indices
+        List<SelicMesDTO> indices
 ) { }

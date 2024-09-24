@@ -1,35 +1,71 @@
 package com.seofi.sajcom.service;
 
-import com.seofi.sajcom.domain.Divida;
-import com.seofi.sajcom.domain.DividaDTO;
-import com.seofi.sajcom.domain.Indice;
-import com.seofi.sajcom.domain.IndiceDTO;
-import com.seofi.sajcom.repository.IndiceRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.seofi.sajcom.domain.*;
+import com.seofi.sajcom.repository.SelicAcumuladaRepository;
+import com.seofi.sajcom.repository.SelicMesRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CalculadoraService {
     @Autowired
-    private IndiceRepository indiceRepo;
+    private SelicMesRepository selicMesRepo;
+    @Autowired
+    private SelicAcumuladaRepository selicAcumuladaRepo;
     @Autowired
     private BacenAPI bacenAPI;
 
     @Transactional
-    public void filtrarIndicesSelic() {
-        LocalDate dataSelicRef = LocalDate.of(2021, 11, 1);
-        List<Indice> indices = bacenAPI.getIndices();
+    public void filtrarIndicesSelic() throws JsonProcessingException {
+        LocalDate dataInicialSelicRef = LocalDate.of(2021, 11, 1);
+        LocalDate dataFinalSelicRef = LocalDate.now().withDayOfMonth(1);
 
-        for(Indice indice : indices){
+        List<SelicMes> indicesAPI = bacenAPI.getIndices();
+        List<SelicMes> indicesDoBanco = selicMesRepo.findAll();
+        List<SelicMes> novosIndices = new ArrayList<>();
+
+        for(SelicMes indice : indicesAPI){
             LocalDate dataIndice = indice.getData();
-            boolean existeNoBanco = this.indiceRepo.existeNoBanco(dataIndice);
-            if(dataSelicRef.isBefore(dataIndice) && !existeNoBanco){
-                this.indiceRepo.save(indice);
+            boolean existeNoBanco = verificarExisteNoBanco(indicesDoBanco, indice);
+            if( !existeNoBanco && dataInicialSelicRef.isBefore(dataIndice)  && dataFinalSelicRef.isAfter(dataIndice)){
+                BigDecimal valor = indice.getValor().setScale(6, RoundingMode.HALF_UP);
+                SelicMes novoSelicMes = new SelicMes(indice.getData(), valor);
+                novosIndices.add(novoSelicMes);
             }
+        }
+        if (!novosIndices.isEmpty()) {
+            this.selicMesRepo.saveAll(novosIndices);
+        }
+        tabelaAcumuladaSelic();
+        novosIndices.forEach(System.out::println);
+    }
+
+    public boolean verificarExisteNoBanco( List<SelicMes> indicesDoBanco, SelicMes indice){
+        return indicesDoBanco.stream().anyMatch(indiceDoBanco -> indiceDoBanco.getData().isEqual(indice.getData()));
+    }
+
+    public void tabelaAcumuladaSelic(){
+        List<SelicMesDTO> indicesSelicDTO = this.selicMesRepo.buscarIndices();
+        indicesSelicDTO.forEach(System.out::println);
+
+        BigDecimal[] selicValorAcumulada = {BigDecimal.ZERO};
+
+        for(SelicMesDTO indice: indicesSelicDTO){
+            BigDecimal valor = indice.valor().divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP);
+            LocalDate data = indice.data();
+            //selicValorAcumulada+= valor;
+            selicValorAcumulada[0] = selicValorAcumulada[0].add(valor).setScale(6, RoundingMode.HALF_UP);
+            System.out.println(selicValorAcumulada[0]);
+
+            this.selicAcumuladaRepo.atualizarValor(data, selicValorAcumulada[0]);
         }
     }
 
@@ -38,15 +74,13 @@ public class CalculadoraService {
         LocalDate dataInicial = divida.getDataInicial();
         LocalDate dataFinal = divida.getDataFinal();
 
-        List<IndiceDTO> intervaloDatas = this.buscarIntervaloDatas(dataInicial, dataFinal);
+        List<SelicMesDTO> intervaloDatas = this.buscarIntervaloDatas(dataInicial, dataFinal);
 
         return new DividaDTO(valor, intervaloDatas);
-
-
     }
 
-    private List<IndiceDTO> buscarIntervaloDatas(LocalDate dataInicial, LocalDate dataFinal){
+    private List<SelicMesDTO> buscarIntervaloDatas(LocalDate dataInicial, LocalDate dataFinal){
         //Verificar se as datas entao validas
-        return this.indiceRepo.buscarIntervalo(dataInicial, dataFinal);
+        return this.selicMesRepo.buscarIntervalo(dataInicial, dataFinal);
     }
 }
