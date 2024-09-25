@@ -26,7 +26,7 @@ public class SelicMes {
     //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     LocalDate data;
     @Column(name = "valor",precision = 10 , scale = 6)
-    BigDecimal valor; // Arrumar precisao
+    BigDecimal valor;
 
 
     public SelicMes(LocalDate data, BigDecimal valor) {

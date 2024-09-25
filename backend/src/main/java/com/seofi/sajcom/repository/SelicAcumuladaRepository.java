@@ -25,10 +25,10 @@ public interface SelicAcumuladaRepository extends JpaRepository<SelicAcumulada, 
 
     @Modifying
     @Query(value = """
-            insert into selic_acumulada (data, valor) values (:data, :valor)
+            insert into selic_acumulada (data, valor) values (:#{#indice.data}, :#{#indice.valor})
             on conflict(data)
             do update
-            set valor = :valor
+            set valor = :#{#indice.valor}
             """, nativeQuery = true)
-    void atualizarValor(LocalDate data, BigDecimal valor);
+    void atualizarValor(SelicAcumulada indice);
 }

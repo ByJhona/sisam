@@ -27,15 +27,14 @@ public class CalculadoraService {
     public void filtrarIndicesSelic() throws JsonProcessingException {
         LocalDate dataInicialSelicRef = LocalDate.of(2021, 11, 1);
         LocalDate dataFinalSelicRef = LocalDate.now().withDayOfMonth(1);
-
         List<SelicMes> indicesAPI = bacenAPI.getIndices();
         List<SelicMes> indicesDoBanco = selicMesRepo.findAll();
         List<SelicMes> novosIndices = new ArrayList<>();
 
-        for(SelicMes indice : indicesAPI){
+        for (SelicMes indice : indicesAPI) {
             LocalDate dataIndice = indice.getData();
             boolean existeNoBanco = verificarExisteNoBanco(indicesDoBanco, indice);
-            if( !existeNoBanco && dataInicialSelicRef.isBefore(dataIndice)  && dataFinalSelicRef.isAfter(dataIndice)){
+            if (!existeNoBanco && dataInicialSelicRef.isBefore(dataIndice) && dataFinalSelicRef.isAfter(dataIndice)) {
                 BigDecimal valor = indice.getValor().setScale(6, RoundingMode.HALF_UP);
                 SelicMes novoSelicMes = new SelicMes(indice.getData(), valor);
                 novosIndices.add(novoSelicMes);
@@ -44,32 +43,29 @@ public class CalculadoraService {
         if (!novosIndices.isEmpty()) {
             this.selicMesRepo.saveAll(novosIndices);
         }
-        tabelaAcumuladaSelic();
-        novosIndices.forEach(System.out::println);
+        atualizarIndicesSelicAcumulada();
     }
 
-    public boolean verificarExisteNoBanco( List<SelicMes> indicesDoBanco, SelicMes indice){
+    public boolean verificarExisteNoBanco(List<SelicMes> indicesDoBanco, SelicMes indice) {
         return indicesDoBanco.stream().anyMatch(indiceDoBanco -> indiceDoBanco.getData().isEqual(indice.getData()));
     }
 
-    public void tabelaAcumuladaSelic(){
+    @Transactional
+    public void atualizarIndicesSelicAcumulada() {
         List<SelicMesDTO> indicesSelicDTO = this.selicMesRepo.buscarIndices();
-        indicesSelicDTO.forEach(System.out::println);
+        BigDecimal valorSelicAcumulado = BigDecimal.ZERO;
 
-        BigDecimal[] selicValorAcumulada = {BigDecimal.ZERO};
-
-        for(SelicMesDTO indice: indicesSelicDTO){
+        for (SelicMesDTO indice : indicesSelicDTO) {
             BigDecimal valor = indice.valor().divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP);
             LocalDate data = indice.data();
-            //selicValorAcumulada+= valor;
-            selicValorAcumulada[0] = selicValorAcumulada[0].add(valor).setScale(6, RoundingMode.HALF_UP);
-            System.out.println(selicValorAcumulada[0]);
+            valorSelicAcumulado = valorSelicAcumulado.add(valor).setScale(6, RoundingMode.HALF_UP);
+            SelicAcumulada indiceAcumulado = new SelicAcumulada(data, valorSelicAcumulado);
 
-            this.selicAcumuladaRepo.atualizarValor(data, selicValorAcumulada[0]);
+            this.selicAcumuladaRepo.atualizarValor(indiceAcumulado);
         }
     }
 
-    public DividaDTO calcularDivida(Divida divida){
+    public DividaDTO calcularDivida(Divida divida) {
         float valor = divida.getValor();
         LocalDate dataInicial = divida.getDataInicial();
         LocalDate dataFinal = divida.getDataFinal();
@@ -79,7 +75,7 @@ public class CalculadoraService {
         return new DividaDTO(valor, intervaloDatas);
     }
 
-    private List<SelicMesDTO> buscarIntervaloDatas(LocalDate dataInicial, LocalDate dataFinal){
+    private List<SelicMesDTO> buscarIntervaloDatas(LocalDate dataInicial, LocalDate dataFinal) {
         //Verificar se as datas entao validas
         return this.selicMesRepo.buscarIntervalo(dataInicial, dataFinal);
     }
