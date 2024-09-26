@@ -60,3 +60,21 @@ form {
 
     }
 }
+
+table{
+    border: 1px rgba(201, 201, 201, 0.349) solid;
+    box-shadow: none;
+      border-collapse: collapse;
+
+    tr:nth-child(even){
+          background:rgb(248, 248, 248);
+          padding: 0;
+    }
+    td{
+          border-bottom: 1px solid #ddd;
+
+    }
+    th{
+          background:rgba(1, 66, 106, 0.568);
+    }
+}

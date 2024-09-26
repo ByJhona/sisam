@@ -1,4 +1,4 @@
-<mat-stepper linear="true" #stepper>
+<mat-stepper linear="false" #stepper>
   <mat-step [stepControl]="infoDivida" editable="false">
     <form [formGroup]="infoDivida">
       <div class="container-input">
@@ -92,15 +92,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
   <mat-step label="Índices" >
     <h6>Valor com juros aplicados:</h6>
     <h6>{{valorTotal}}</h6>
@@ -127,8 +118,6 @@
       <button class="bnt-calcular" (click)="stepper.next()" type="submit">Gerar Relatório</button>
       <button class="bnt-limpar" (click)="stepper.previous()">Recalcular</button>
     </div>
-
-
   </mat-step>
 
 

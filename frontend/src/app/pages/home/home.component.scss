@@ -2,16 +2,16 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(192, 192, 192, 0.171);
+    width: 100%;
+    min-height: 100%;
+    background-color: rgba(236, 236, 236, 0.171);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 
     .container-central {
         display: flex;
         flex-direction: column;
         background-color: transparent;
-        position: absolute;
-        top: 1rem;
 
         .container-header {
             height: 5rem;
