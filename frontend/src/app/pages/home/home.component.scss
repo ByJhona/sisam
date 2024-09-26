@@ -10,7 +10,8 @@
         display: flex;
         flex-direction: column;
         background-color: transparent;
-        height: 90%;
+        position: absolute;
+        top: 1rem;
 
         .container-header {
             height: 5rem;

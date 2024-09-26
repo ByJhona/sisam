@@ -1,9 +1,10 @@
 package com.seofi.sajcom.domain;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public record DividaDTO(
-        float valor,
-        List<SelicMesDTO> indices
+        BigDecimal valor,
+        List<SelicAcumuladaDTO> indices
 ) { }

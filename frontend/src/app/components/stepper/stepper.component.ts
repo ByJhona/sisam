@@ -153,7 +153,8 @@ export class StepperComponent {
 
   enviarApi(divida: Divida): void {
     this.calculadoraService.enviarDados(divida).subscribe((result) => {
-      this.dataSource.data = result.indices
+      this.dataSource.data = result.indices;
+      this.valorTotal = result.valor
     })
   }
 }

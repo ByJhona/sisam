@@ -15,8 +15,7 @@ public class CalculadoraController {
     private CalculadoraService calculadoraServ;
 
     @PostMapping("calcular")
-    public ResponseEntity<DividaDTO> mostrarResultado(@RequestBody Divida divida) throws JsonProcessingException {
-        this.calculadoraServ.filtrarIndicesSelic();
+    public ResponseEntity<DividaDTO> mostrarResultado(@RequestBody Divida divida){
         DividaDTO dividaDTO = this.calculadoraServ.calcularDivida(divida);
         return ResponseEntity.ok().body(dividaDTO);
     }

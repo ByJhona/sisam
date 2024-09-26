@@ -66,17 +66,24 @@ public class CalculadoraService {
     }
 
     public DividaDTO calcularDivida(Divida divida) {
-        float valor = divida.getValor();
         LocalDate dataInicial = divida.getDataInicial();
         LocalDate dataFinal = divida.getDataFinal();
+        BigDecimal total = BigDecimal.valueOf(divida.getValor());
+        BigDecimal jurosAcumulado = BigDecimal.ZERO;;
 
-        List<SelicMesDTO> intervaloDatas = this.buscarIntervaloDatas(dataInicial, dataFinal);
+        List<SelicAcumuladaDTO> intervaloDatas = this.buscarIntervaloDatas(dataInicial, dataFinal);
 
-        return new DividaDTO(valor, intervaloDatas);
+        for (SelicAcumuladaDTO indice : intervaloDatas){
+            BigDecimal aux = total.multiply(indice.valor());
+            jurosAcumulado = jurosAcumulado.add(aux);
+            System.out.println(jurosAcumulado);
+        }
+        total = total.add(jurosAcumulado);
+        return new DividaDTO(total, intervaloDatas);
     }
 
-    private List<SelicMesDTO> buscarIntervaloDatas(LocalDate dataInicial, LocalDate dataFinal) {
+    private List<SelicAcumuladaDTO> buscarIntervaloDatas(LocalDate dataInicial, LocalDate dataFinal) {
         //Verificar se as datas entao validas
-        return this.selicMesRepo.buscarIntervalo(dataInicial, dataFinal);
+        return this.selicAcumuladaRepo.buscarIntervalo(dataInicial, dataFinal);
     }
 }

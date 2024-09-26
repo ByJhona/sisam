@@ -1,5 +1,5 @@
 <mat-stepper linear="true" #stepper>
-  <mat-step [stepControl]="infoDivida">
+  <mat-step [stepControl]="infoDivida" editable="false">
     <form [formGroup]="infoDivida">
       <div class="container-input">
 
@@ -101,39 +101,43 @@
 
 
 
-  <mat-step label="Índices">
-
+  <mat-step label="Índices" >
+    <h6>Valor com juros aplicados:</h6>
+    <h6>{{valorTotal}}</h6>
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
 
-    <!-- Name Column -->
-    <ng-container matColumnDef="data">
-      <th mat-header-cell *matHeaderCellDef> Data </th>
-      <td mat-cell *matCellDef="let element"> {{element.data}} </td>
-    </ng-container>
+      <!-- Name Column -->
+      <ng-container matColumnDef="data">
+        <th mat-header-cell *matHeaderCellDef> Data </th>
+        <td mat-cell *matCellDef="let element"> {{element.data}} </td>
+      </ng-container>
 
-    <!-- Weight Column -->
-    <ng-container matColumnDef="valor">
-      <th mat-header-cell *matHeaderCellDef> Valor </th>
-      <td mat-cell *matCellDef="let element"> {{element.valor}} </td>
-    </ng-container>
+      <!-- Weight Column -->
+      <ng-container matColumnDef="valor">
+        <th mat-header-cell *matHeaderCellDef> Índice </th>
+        <td mat-cell *matCellDef="let element"> {{element.valor}} </td>
+      </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-paginator  [pageSizeOptions]="[5, 10]"></mat-paginator>
-
+    <mat-paginator [pageSizeOptions]="[5, 10]"></mat-paginator>
+    <div class="bnt">
+      <button class="bnt-calcular" (click)="stepper.next()" type="submit">Gerar Relatório</button>
+      <button class="bnt-limpar" (click)="stepper.previous()">Recalcular</button>
+    </div>
 
 
   </mat-step>
 
 
-  <mat-step>
+  <mat-step >
     <ng-template matStepLabel>Gerar Relatório</ng-template>
     <p>You are now done.</p>
     <div>
       <button mat-button matStepperPrevious>Back</button>
-      <button mat-button (click)="limparCampos()">Reset</button>
+      <button mat-button (click)="stepper.reset()">Reset</button>
     </div>
   </mat-step>
 </mat-stepper>
