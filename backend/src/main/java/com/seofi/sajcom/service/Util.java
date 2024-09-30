@@ -45,27 +45,13 @@ public class Util {
         if (!novosIndices.isEmpty()) {
             this.selicMesRepo.saveAll(novosIndices);
         }
-        atualizarIndicesSelicAcumulada();
     }
 
     public boolean verificarExisteNoBanco(List<SelicMes> indicesDoBanco, SelicMes indice) {
         return indicesDoBanco.stream().anyMatch(indiceDoBanco -> indiceDoBanco.getData().isEqual(indice.getData()));
     }
 
-    @Transactional
-    public void atualizarIndicesSelicAcumulada() {
-        List<SelicMesDTO> indicesSelicDTO = this.selicMesRepo.buscarIndices();
-        BigDecimal valorSelicAcumulado = BigDecimal.ZERO;
 
-        for (SelicMesDTO indice : indicesSelicDTO) {
-            BigDecimal valor = indice.valor().divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP);
-            LocalDate data = indice.data();
-            valorSelicAcumulado = valorSelicAcumulado.add(valor).setScale(6, RoundingMode.HALF_UP);
-            SelicAcumulada indiceAcumulado = new SelicAcumulada(data, valorSelicAcumulado);
-
-            this.selicAcumuladaRepo.atualizarValor(indiceAcumulado);
-        }
-    }
 
     public List<SelicAcumuladaDTO> buscarIntervaloDatas(LocalDate dataInicial, LocalDate dataFinal) {
         validarDataInicialFinal(dataInicial, dataFinal);
