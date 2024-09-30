@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.seofi.sajcom.domain.Divida;
 import com.seofi.sajcom.domain.DividaDTO;
 import com.seofi.sajcom.service.CalculadoraService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ public class CalculadoraController {
     private CalculadoraService calculadoraServ;
 
     @PostMapping("calcular")
-    public ResponseEntity<DividaDTO> mostrarResultado(@RequestBody Divida divida){
+    public ResponseEntity<DividaDTO> mostrarResultado(@Valid @RequestBody Divida divida){
         DividaDTO dividaDTO = this.calculadoraServ.calcularDivida(divida);
         return ResponseEntity.ok().body(dividaDTO);
     }

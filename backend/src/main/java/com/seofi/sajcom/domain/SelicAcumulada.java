@@ -1,8 +1,10 @@
 package com.seofi.sajcom.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.cglib.core.Local;
 
 import java.math.BigDecimal;
