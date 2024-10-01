@@ -9,12 +9,14 @@ import { NgxMaskDirective } from 'ngx-mask';
 import { TabelaComponent } from "../tabela/tabela.component";
 import { Divida } from '../../types/divida';
 import { CalculadoraAPIService } from '../../service/calculadora-api.service';
-import { Resultado } from '../../types/resultado';
 import { Indice } from '../../types/Indice';
-import { Observable } from 'rxjs';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
-import { format } from "date-fns"
+import { DividaCalculada } from '../../types/dividaCalculada';
+import { meses } from '../../util/meses';
+import { gerarAnos } from '../../util/anos';
+import { CardComponent } from "../card/card.component";
+import { formatarMesAno } from '../../util/manipularData';
 
 
 
@@ -28,7 +30,7 @@ import { format } from "date-fns"
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatInputModule, MatFormFieldModule, MatInputModule, MatSelectModule, NgxMaskDirective, TabelaComponent, MatTableModule, MatPaginator],
+    MatInputModule, MatFormFieldModule, MatInputModule, MatSelectModule, NgxMaskDirective, TabelaComponent, MatTableModule, MatPaginator, CardComponent],
 
   templateUrl: './stepper.component.html',
   styleUrl: './stepper.component.scss'
@@ -39,35 +41,15 @@ export class StepperComponent {
 
   }
 
-  private _formBuilder = inject(FormBuilder);
-  meses = [
-    { "nome": "Janeiro", "valor": 1 },
-    { "nome": "Fevereiro", "valor": 2 },
-    { "nome": "Março", "valor": 3 },
-    { "nome": "Abril", "valor": 4 },
-    { "nome": "Maio", "valor": 5 },
-    { "nome": "Junho", "valor": 6 },
-    { "nome": "Julho", "valor": 7 },
-    { "nome": "Agosto", "valor": 8 },
-    { "nome": "Setembro", "valor": 9 },
-    { "nome": "Outubro", "valor": 10 },
-    { "nome": "Novembro", "valor": 11 },
-    { "nome": "Dezembro", "valor": 12 }
-  ]
-  anoInicial: number = 1994
-  anos: number[] = []
-  resultApi!: Observable<Resultado>
-  valorTotal!: number
-  indices!: Indice[]
+  anos: number[] = gerarAnos()
+  meses = meses
+  dataInicial: string = ""
+  dataFinal: string = ""
   displayedColumns: string[] = ['data', 'valor'];
   dataSource = new MatTableDataSource<Indice>();
+  dividaCalculada: DividaCalculada = new DividaCalculada();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-  }
-
-
+  private _formBuilder = inject(FormBuilder);
   infoDivida = this._formBuilder.group({
     valor: ['', Validators.required],
     mesInicial: ['', Validators.required],
@@ -75,6 +57,12 @@ export class StepperComponent {
     mesFinal: ['', Validators.required],
     anoFinal: ['', [Validators.required]]
   }, { validators: this.dataFinalMenorDataFinal() });
+
+
+
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+  }
 
   limparCampos(): void {
     this.infoDivida.reset({ valor: '', mesInicial: '', anoFinal: '', mesFinal: '', anoInicial: '' })
@@ -111,17 +99,7 @@ export class StepperComponent {
 
   }
 
-  gerarAnos(): number[] {
-    const anoAtual = new Date().getFullYear();
-    var anosGerados: number[] = []
-    for (var i = this.anoInicial; i <= anoAtual; i++) {
-      anosGerados.push(i);
-    }
-    return anosGerados.sort((a, b) => { return b - a });
-  }
-
   ngOnInit(): void {
-    this.anos = this.gerarAnos();
   }
 
   validarDivida(): boolean {
@@ -155,7 +133,16 @@ export class StepperComponent {
   enviarApi(divida: Divida): void {
     this.calculadoraService.enviarDados(divida).subscribe((result) => {
       this.dataSource.data = result.indices;
-      this.valorTotal = result.valor
+      this.dividaCalculada = new DividaCalculada(result.valorInicial, result.valorFinal, result.dataInicial, result.dataFinal, result.indices);
+      
+      
+      this.dataInicial = formatarMesAno(this.dividaCalculada.dataInicial)
+      this.dataFinal = formatarMesAno(this.dividaCalculada.dataFinal)
+
+      console.log(this.dataInicial)
+      console.log(this.dataFinal)
+      console.log(this.dividaCalculada)
+
     })
   }
 }

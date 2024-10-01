@@ -26,7 +26,7 @@ public class CalculadoraService {
         List<SelicAcumuladaDTO> intervaloDatas = this.util.buscarIntervaloDatas(dataInicial, dataFinal);
         BigDecimal total = calcularMontanteTotal(valor, intervaloDatas);
 
-        return new DividaDTO(total, intervaloDatas);
+        return new DividaDTO(valor, total, dataInicial, dataFinal, intervaloDatas);
     }
 
     private BigDecimal calcularMontanteTotal( BigDecimal total, List<SelicAcumuladaDTO> intervaloDatas){

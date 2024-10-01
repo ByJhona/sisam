@@ -30,7 +30,7 @@ public class AtualizarSelicMes {
     private static final String TIME_ZONE = "America/Sao_Paulo";
 
 
-    @Scheduled(zone = TIME_ZONE, cron = "0 0 13 * * ?")
+    @Scheduled(zone = TIME_ZONE, cron = "0 0 1 1 * ?")
     @Transactional
     public void filtrarIndicesSelic() throws JsonProcessingException {
         LocalDate dataInicialSelicRef = LocalDate.of(2021, 11, 1);

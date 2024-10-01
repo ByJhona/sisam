@@ -1,6 +1,8 @@
-<mat-stepper linear="true" #stepper>
+<mat-stepper linear="false" #stepper>
   <mat-step [stepControl]="infoDivida" editable="true">
+
     <form [formGroup]="infoDivida">
+
       <div class="container-input">
 
         <ng-template matStepLabel>Informações</ng-template>
@@ -18,6 +20,7 @@
 
         </div>
       </div>
+
 
       <div class="container-input">
         <ng-template matStepLabel>Informações</ng-template>
@@ -90,11 +93,19 @@
 
 
 
+  <mat-step label="Índices">
+
+    <div class="info-valores">
+      <app-card titulo="Valor inicial" [valor]="dividaCalculada.valorInicial"></app-card>
+      <app-card titulo="Dívida calculada" [valor]="dividaCalculada.valorFinal"></app-card>
+    </div>
+
+    <div class="info-tabela">
+      <h6 class="titulo">Tabela de índices</h6>
+      <p class="legenda"> {{dataInicial}} até {{dataFinal}}</p>
+    </div>
 
 
-  <mat-step label="Índices" >
-    <h6>Valor com juros aplicados:</h6>
-    <h6>{{valorTotal}}</h6>
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
 
 
@@ -121,8 +132,8 @@
   </mat-step>
 
 
-  <mat-step >
-    <ng-template matStepLabel>Gerar Relatório</ng-template>
+  <mat-step>
+    <ng-template matStepLabel>Relatório (PDF)</ng-template>
     <p>You are now done.</p>
     <div>
       <button mat-button matStepperPrevious>Back</button>

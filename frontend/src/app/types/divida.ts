@@ -1,4 +1,3 @@
-import { format } from "date-fns"
 
 export interface Divida{
     valor: number,
@@ -6,7 +5,3 @@ export interface Divida{
     dataFinal: Date
 }
 
-
-export function formatarData(data:Date):String {
-    return format(data, "yyyy-MM-dd")
-  }
