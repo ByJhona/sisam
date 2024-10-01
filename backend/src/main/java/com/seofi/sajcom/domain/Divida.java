@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Setter
@@ -14,7 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Divida {
     @NotNull(message = "O valor da dívida precisa ser informado.")
-    float valor;
+    BigDecimal valor;
     @NotNull(message = "A data inicial precisa ser informada.")
     LocalDate dataInicial;
     @NotNull(message = "A data final precisa ser informada.")

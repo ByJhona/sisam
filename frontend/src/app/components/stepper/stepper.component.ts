@@ -14,6 +14,7 @@ import { Indice } from '../../types/Indice';
 import { Observable } from 'rxjs';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { format } from "date-fns"
 
 
 
@@ -59,10 +60,10 @@ export class StepperComponent {
   valorTotal!: number
   indices!: Indice[]
   displayedColumns: string[] = ['data', 'valor'];
-  dataSource  = new MatTableDataSource<Indice>();
+  dataSource = new MatTableDataSource<Indice>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  ngAfterViewInit(){
+  ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
   }
 

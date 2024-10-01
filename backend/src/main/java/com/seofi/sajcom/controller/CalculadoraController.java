@@ -9,14 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/")
 public class CalculadoraController {
     @Autowired
     private CalculadoraService calculadoraServ;
 
-    @PostMapping("calcular")
-    public ResponseEntity<DividaDTO> mostrarResultado(@Valid @RequestBody Divida divida){
+    @GetMapping("calcular")
+    public ResponseEntity<DividaDTO> mostrarResultado(@RequestParam  BigDecimal valor, @RequestParam  LocalDate dataInicial, @RequestParam  LocalDate dataFinal){
+        Divida divida = new Divida(valor, dataInicial, dataFinal);
         DividaDTO dividaDTO = this.calculadoraServ.calcularDivida(divida);
         return ResponseEntity.ok().body(dividaDTO);
     }

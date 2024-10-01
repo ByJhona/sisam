@@ -22,7 +22,7 @@ public class CalculadoraService {
     public DividaDTO calcularDivida(Divida divida) {
         LocalDate dataInicial = divida.getDataInicial();
         LocalDate dataFinal = divida.getDataFinal();
-        BigDecimal valor = BigDecimal.valueOf(divida.getValor());
+        BigDecimal valor = divida.getValor();
         List<SelicAcumuladaDTO> intervaloDatas = this.util.buscarIntervaloDatas(dataInicial, dataFinal);
         BigDecimal total = calcularMontanteTotal(valor, intervaloDatas);
 

@@ -24,35 +24,6 @@ public class Util {
     @Autowired
     private BacenAPI bacenAPI;
 
-
-    @Transactional
-    public void filtrarIndicesSelic() throws JsonProcessingException {
-        LocalDate dataInicialSelicRef = LocalDate.of(2021, 11, 1);
-        LocalDate dataFinalSelicRef = LocalDate.now().withDayOfMonth(1);
-        List<SelicMes> indicesAPI = bacenAPI.getIndices();
-        List<SelicMes> indicesDoBanco = selicMesRepo.findAll();
-        List<SelicMes> novosIndices = new ArrayList<>();
-
-        for (SelicMes indice : indicesAPI) {
-            LocalDate dataIndice = indice.getData();
-            boolean existeNoBanco = verificarExisteNoBanco(indicesDoBanco, indice);
-            if (!existeNoBanco && dataInicialSelicRef.isBefore(dataIndice) && dataFinalSelicRef.isAfter(dataIndice)) {
-                BigDecimal valor = indice.getValor().setScale(6, RoundingMode.HALF_UP);
-                SelicMes novoSelicMes = new SelicMes(indice.getData(), valor);
-                novosIndices.add(novoSelicMes);
-            }
-        }
-        if (!novosIndices.isEmpty()) {
-            this.selicMesRepo.saveAll(novosIndices);
-        }
-    }
-
-    public boolean verificarExisteNoBanco(List<SelicMes> indicesDoBanco, SelicMes indice) {
-        return indicesDoBanco.stream().anyMatch(indiceDoBanco -> indiceDoBanco.getData().isEqual(indice.getData()));
-    }
-
-
-
     public List<SelicAcumuladaDTO> buscarIntervaloDatas(LocalDate dataInicial, LocalDate dataFinal) {
         validarDataInicialFinal(dataInicial, dataFinal);
         List<SelicAcumuladaDTO> intervaloIndices = this.selicAcumuladaRepo.buscarIntervalo(dataInicial, dataFinal);
