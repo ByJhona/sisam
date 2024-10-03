@@ -40,4 +40,9 @@ public interface SelicAcumuladaRepository extends JpaRepository<SelicAcumulada, 
             """)
     List<SelicAcumuladaDTO> buscarIntervalo(LocalDate dataInicial, LocalDate dataFinal);
 
+    @Query("""
+            select new com.seofi.sajcom.domain.SelicAcumuladaDTO(indice.data, indice.valor) from SelicAcumulada indice
+            """)
+    List<SelicAcumuladaDTO> buscarTudo();
+
 }
