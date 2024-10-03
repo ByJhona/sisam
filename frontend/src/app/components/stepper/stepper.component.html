@@ -1,11 +1,10 @@
-<mat-stepper linear="false" #stepper>
-  <mat-step [stepControl]="infoDivida" editable="true">
-
+<mat-stepper linear="true" #stepper>
+  <mat-step  editable="true" label="Informações" [completed]="infoDivida.valid || infoDivida.disabled">
+    <ng-template matStepperIcon="edit">
+    <mat-icon>check</mat-icon>
+  </ng-template>
     <form [formGroup]="infoDivida">
-
       <div class="container-input">
-
-        <ng-template matStepLabel>Informações</ng-template>
         <h2 class="label">Valor da dívida:</h2>
         <div class="data">
           <mat-form-field appearance="outline">
@@ -17,13 +16,10 @@
             <mat-error>Insira um valor válido!</mat-error>
             }
           </mat-form-field>
-
         </div>
       </div>
 
-
       <div class="container-input">
-        <ng-template matStepLabel>Informações</ng-template>
         <h2 class="label">Data de início:</h2>
         <div class="data">
           <mat-form-field appearance="outline">
@@ -35,7 +31,6 @@
             @if (!infoDivida.hasError('required')) {
             <mat-error>Insira o mês!</mat-error>
             }
-
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -47,14 +42,11 @@
             @if (!infoDivida.hasError('required')) {
             <mat-error>Insira o ano!</mat-error>
             }
-
           </mat-form-field>
-
         </div>
       </div>
 
       <div class="container-input">
-        <ng-template matStepLabel>Informações</ng-template>
         <h2 class="label">Data de término:</h2>
         <div class="data">
           <mat-form-field appearance="outline">
@@ -75,7 +67,6 @@
               <mat-option [value]="ano">{{ano}}</mat-option>
               }
             </mat-select>
-
             @if (infoDivida.hasError('dataFinalMenor')) {
             <mat-error>Data final inválida!</mat-error>
             }@else if(!infoDivida.hasError('required')){
@@ -85,30 +76,25 @@
         </div>
       </div>
       <div class="bnt">
-        <button class="bnt-calcular" (click)="onSubmit(stepper)" type="submit">Calcular</button>
-        <button class="bnt-limpar" (click)="limparCampos()">Limpar</button>
+        <button class="bnt-preenchido" (click)="onSubmit(stepper)" type="submit">Calcular</button>
+        <button class="bnt-outline" (click)="limparCampos(stepper)">Limpar</button>
       </div>
     </form>
   </mat-step>
 
-
-
-  <mat-step label="Índices">
-
+  <mat-step label="Índices" [completed]="isGerarRelatorio">
+  <ng-template matStepperIcon="edit">
+    <mat-icon>check</mat-icon>
+  </ng-template>
     <div class="info-valores">
       <app-card titulo="Valor inicial" [valor]="dividaCalculada.valorInicial"></app-card>
       <app-card titulo="Dívida calculada" [valor]="dividaCalculada.valorFinal"></app-card>
     </div>
-
     <div class="info-tabela">
       <h6 class="titulo">Tabela de índices</h6>
       <p class="legenda"> {{dataInicial}} até {{dataFinal}}</p>
     </div>
-
-
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-
-
       <!-- Name Column -->
       <ng-container matColumnDef="data">
         <th mat-header-cell *matHeaderCellDef> Data </th>
@@ -124,20 +110,22 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-    <mat-paginator [pageSizeOptions]="[5, 10]"></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
     <div class="bnt">
-      <button class="bnt-calcular" (click)="stepper.next()" type="submit">Gerar Relatório</button>
-      <button class="bnt-limpar" (click)="stepper.previous()">Recalcular</button>
+      <button class="bnt-preenchido" (click)="gerarRelatorio(stepper)" type="buttom">Gerar Relatório</button>
+      <button class="bnt-outline" (click)="stepper.previous()">Voltar</button>
     </div>
   </mat-step>
 
-
-  <mat-step>
-    <ng-template matStepLabel>Relatório (PDF)</ng-template>
-    <p>You are now done.</p>
-    <div>
-      <button mat-button matStepperPrevious>Back</button>
-      <button mat-button (click)="stepper.reset()">Reset</button>
+  <mat-step label="Relatório (PDF)">
+  <ng-template matStepperIcon="edit">
+    <mat-icon>check</mat-icon>
+  </ng-template>
+    <p>Tabela de Atualização Monetária </p>
+    <div class="bnt">
+      <button class="bnt-preenchido" (click)="baixarRelatorio()" type="buttom">Baixar Relatório (PDF)</button>
+      <button class="bnt-outline" (click)="limparCampos(stepper)">Novo Calculo</button>
+      <button class="bnt-outline" (click)="stepper.previous()">Voltar</button>
     </div>
   </mat-step>
 </mat-stepper>

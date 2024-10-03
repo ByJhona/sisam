@@ -6,7 +6,6 @@ import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { NgxMaskDirective } from 'ngx-mask';
-import { TabelaComponent } from "../tabela/tabela.component";
 import { Divida } from '../../types/divida';
 import { CalculadoraAPIService } from '../../service/calculadora-api.service';
 import { Indice } from '../../types/Indice';
@@ -17,6 +16,7 @@ import { meses } from '../../util/meses';
 import { gerarAnos } from '../../util/anos';
 import { CardComponent } from "../card/card.component";
 import { formatarMesAno } from '../../util/manipularData';
+import { MatIcon } from '@angular/material/icon';
 
 
 
@@ -30,7 +30,7 @@ import { formatarMesAno } from '../../util/manipularData';
     FormsModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatInputModule, MatFormFieldModule, MatInputModule, MatSelectModule, NgxMaskDirective, TabelaComponent, MatTableModule, MatPaginator, CardComponent],
+    MatInputModule, MatFormFieldModule, MatInputModule, MatSelectModule, NgxMaskDirective, MatTableModule, MatPaginator, CardComponent, MatIcon],
 
   templateUrl: './stepper.component.html',
   styleUrl: './stepper.component.scss'
@@ -40,7 +40,10 @@ export class StepperComponent {
   constructor(private calculadoraService: CalculadoraAPIService) {
 
   }
-
+  // Criar logica para deixar o usuario acessar uma fase q ele nao tem acesso
+  //Bug quando o usuario nao apertou o botao pra calcular e ele pode ir pra pagina 2
+  documentoBinario: Blob = new Blob();
+  isGerarRelatorio = false
   anos: number[] = gerarAnos()
   meses = meses
   dataInicial: string = ""
@@ -64,7 +67,14 @@ export class StepperComponent {
     this.dataSource.paginator = this.paginator;
   }
 
-  limparCampos(): void {
+  limparCampos(stepper: MatStepper): void {
+    stepper.reset();
+    this.infoDivida.get("valor")?.enable()
+      this.infoDivida.get("mesInicial")?.enable()
+      this.infoDivida.get("mesFinal")?.enable()
+      this.infoDivida.get("anoInicial")?.enable()
+      this.infoDivida.get("anoFinal")?.enable()
+      this.isGerarRelatorio = false
     this.infoDivida.reset({ valor: '', mesInicial: '', anoFinal: '', mesFinal: '', anoInicial: '' })
   }
 
@@ -75,6 +85,12 @@ export class StepperComponent {
       var divida: Divida = this.construirObjetoDivida();
       this.enviarApi(divida);
       stepper.next();
+      this.infoDivida.get("valor")?.disable()
+      this.infoDivida.get("mesInicial")?.disable()
+      this.infoDivida.get("mesFinal")?.disable()
+      this.infoDivida.get("anoInicial")?.disable()
+      this.infoDivida.get("anoFinal")?.disable()
+
     }
   }
 
@@ -134,8 +150,8 @@ export class StepperComponent {
     this.calculadoraService.enviarDados(divida).subscribe((result) => {
       this.dataSource.data = result.indices;
       this.dividaCalculada = new DividaCalculada(result.valorInicial, result.valorFinal, result.dataInicial, result.dataFinal, result.indices);
-      
-      
+
+
       this.dataInicial = formatarMesAno(this.dividaCalculada.dataInicial)
       this.dataFinal = formatarMesAno(this.dividaCalculada.dataFinal)
 
@@ -144,5 +160,33 @@ export class StepperComponent {
       console.log(this.dividaCalculada)
 
     })
+  }
+
+  gerarRelatorio(stepper: MatStepper) {
+      this.isGerarRelatorio = true
+    this.calculadoraService.baixarRelatorio(this.dividaCalculada.dataInicial, this.dividaCalculada.dataFinal).subscribe(result => {
+      this.documentoBinario = new Blob([result], { type: 'application/pdf' });
+      stepper.next();
+      this.abrirRelatorio();
+
+    });
+
+  }
+
+  baixarRelatorio() {
+    const url = window.URL.createObjectURL(this.documentoBinario);
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'Tabela de Atualização Monetária.pdf'; // Nome do arquivo para download
+    link.click();
+    window.URL.revokeObjectURL(url); // Limpa a URL criada
+  }
+
+  abrirRelatorio() {
+    const url = window.URL.createObjectURL(this.documentoBinario);
+    window.open(url);
+    window.URL.revokeObjectURL(url); // Limpa a URL criada
+
+
   }
 }

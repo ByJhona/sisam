@@ -38,7 +38,7 @@ form {
     margin-top: 1.5rem;
     width: 100%;
 
-    .bnt-calcular {
+    .bnt-preenchido {
         border-radius: .5rem;
         background-color: #01426A;
         color: #ffffff;
@@ -48,7 +48,7 @@ form {
         cursor: pointer;
     }
 
-    .bnt-limpar {
+    .bnt-outline {
         background-color: transparent;
         border: solid #01426A .15rem;
         color: #01426A;
@@ -59,6 +59,19 @@ form {
 
 
     }
+
+    .bnt-no-outline {
+        background-color: transparent;
+        border: none;
+        color: #01426A;
+        border-radius: .5rem;
+        margin: .6rem;
+        padding: .6rem;
+        cursor: pointer;
+
+
+    }
+
 }
 
 table {
