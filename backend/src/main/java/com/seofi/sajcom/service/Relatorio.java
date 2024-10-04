@@ -65,6 +65,13 @@ public class Relatorio {
             PdfPTable tabelaSelicAcumulada = new PdfPTable(13);
             gerarTabelaSelicAcumulada(tabelaSelicAcumulada, dataInicial, dataFinal, width);
             documento.add(tabelaSelicAcumulada);
+            documento.add(tabelaSelicAcumulada);
+            documento.add(tabelaSelicAcumulada);
+            documento.add(tabelaSelicAcumulada);
+            documento.add(tabelaSelicAcumulada);documento.add(tabelaSelicAcumulada);
+            documento.add(tabelaSelicAcumulada);
+            documento.add(tabelaSelicAcumulada);
+            documento.add(tabelaSelicAcumulada);
             documento.add(new Paragraph("Obs: Para os créditos não tributários, a partir de dez/2021, a atualização monetária será feita com base na variação da SELIC (EC 113 de 08/12/2021, art. 3º), incidente sobre o valor total consolidado do crédito atualizado até dez/2021. Adoção do regime de capitalização simples da Taxa Selic deve ser aplicada no mês posterior ao de sua competência, inclusive para o mês de pagamento, sem, contudo, aplicar a taxa referente a 1% (um por cento) sobre o valor devido, em razão da ausência de previsão legal para tais pagamento sobre débitos não tributários da Fazenda Pública.\n", font8));
 
         } catch (RuntimeException ex) {
@@ -167,7 +174,7 @@ public class Relatorio {
                 PdfPCell celula = new PdfPCell(new Phrase(valor != null ? String.valueOf(valor) : "", font8));
                 celula.setHorizontalAlignment(Element.ALIGN_CENTER);
                 if (ano % 2 == 0) {
-                    celula.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x0A));
+                    celula.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
                 }
                 //Colorir celulas que sao entre o intervalo da divida do solicitante
                 if ((ano > dataInicial.getYear() || (ano == dataInicial.getYear() && i >= dataInicial.getMonthValue() - 1)) &&
