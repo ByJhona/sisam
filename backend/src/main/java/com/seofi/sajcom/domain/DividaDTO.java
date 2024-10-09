@@ -13,5 +13,5 @@ public record DividaDTO(
         LocalDate dataInicial,
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate dataFinal,
-        List<SelicAcumuladaDTO> indices
+        List<Indice> indices
 ) { }

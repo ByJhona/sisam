@@ -15,15 +15,9 @@ import com.lowagie.text.pdf.PdfWriter;
 import com.seofi.sajcom.domain.SelicAcumuladaDTO;
 import com.seofi.sajcom.repository.SelicAcumuladaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -34,15 +28,15 @@ import java.util.List;
 public class Relatorio {
     @Autowired
     private SelicAcumuladaRepository selicAcumuladaRepo;
-    Map<Integer, List<BigDecimal>> dictSelicAcumulada;
+    private static final Color COR_CINZA = new Color(0x69, 0x69, 0x69, 0x33);
+    private static final Color COR_AMARELO = new Color(0xFF, 0xFF, 0x00, 0x33);
+    private static final Font font8 = FontFactory.getFont(FontFactory.HELVETICA, 8);
+    private static final Font font8Bold = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8);
 
-    Relatorio() {
-        this.dictSelicAcumulada = new HashMap<>();
-    }
+
 
     public byte[] gerarPDF(LocalDate dataInicial, LocalDate dataFinal) throws IOException {
-        Font font8 = FontFactory.getFont(FontFactory.HELVETICA, 8);
-        Font font8Bold = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8);
+
 
         ByteArrayOutputStream documentoBinario = new ByteArrayOutputStream();
 
@@ -55,146 +49,139 @@ public class Relatorio {
 
             documento.open();
 
-            Paragraph titulo = new Paragraph("TABELA DE ÍNDICES - TAXA SELIC (SIMPLES), DE ACORDO COM A RESOLUÇÃO CSJT Nº 137/2014.", font8Bold);
-            Paragraph espaco = new Paragraph(" ");
-
-            titulo.setAlignment(Element.ALIGN_CENTER);
+            Paragraph titulo = inserirTitulo( "TABELA DE ÍNDICES - TAXA SELIC (SIMPLES), DE ACORDO COM A RESOLUÇÃO CSJT Nº 137/2014.");
             documento.add(titulo);
-            documento.add(espaco);
 
             PdfPTable tabelaSelicAcumulada = new PdfPTable(13);
             gerarTabelaSelicAcumulada(tabelaSelicAcumulada, dataInicial, dataFinal, width);
             documento.add(tabelaSelicAcumulada);
-            documento.add(tabelaSelicAcumulada);
-            documento.add(tabelaSelicAcumulada);
-            documento.add(tabelaSelicAcumulada);
-            documento.add(tabelaSelicAcumulada);documento.add(tabelaSelicAcumulada);
-            documento.add(tabelaSelicAcumulada);
-            documento.add(tabelaSelicAcumulada);
-            documento.add(tabelaSelicAcumulada);
+
             documento.add(new Paragraph("Obs: Para os créditos não tributários, a partir de dez/2021, a atualização monetária será feita com base na variação da SELIC (EC 113 de 08/12/2021, art. 3º), incidente sobre o valor total consolidado do crédito atualizado até dez/2021. Adoção do regime de capitalização simples da Taxa Selic deve ser aplicada no mês posterior ao de sua competência, inclusive para o mês de pagamento, sem, contudo, aplicar a taxa referente a 1% (um por cento) sobre o valor devido, em razão da ausência de previsão legal para tais pagamento sobre débitos não tributários da Fazenda Pública.\n", font8));
 
         } catch (RuntimeException ex) {
 
         }
-        System.out.println("Abriu e fechou o PDF.");
         documento.close();
 
         return documentoBinario.toByteArray();
     }
 
+    private Paragraph inserirTitulo(String tituloString){
+        Paragraph titulo = new Paragraph(tituloString, font8Bold);
+        Paragraph espaco = new Paragraph(" \n");
+        titulo.add(espaco);
+
+        titulo.setAlignment(Element.ALIGN_CENTER);
+       return titulo;
+    }
+
     private void gerarTabelaSelicAcumulada(PdfPTable tabela, LocalDate dataInical, LocalDate dataFinal, float width) {
-
         extrairSelicAcumulada();
-
         Font font8 = FontFactory.getFont(FontFactory.HELVETICA, 8);
         Font font8Bold = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8);
-
         tabela.getDefaultCell().setBorder(PdfPCell.BOX);
         tabela.setTotalWidth(width - 72);
         tabela.setLockedWidth(true);
-
         gerarCabecalhoTabelaSelicAcumulada(tabela, font8Bold);
-        gerarLinhasTabelaSelicAcumulada(dataInical, dataFinal, tabela, font8, font8Bold);
+        List<PdfPCell> celulasLinhas = gerarLinhasTabelaSelicAcumulada(dataInical, dataFinal, font8, font8Bold);
+        for(PdfPCell celulaLinha: celulasLinhas){
+            tabela.addCell(celulaLinha);
+        }
     }
 
     private void gerarCabecalhoTabelaSelicAcumulada(PdfPTable tabela, Font font8Bold) {
-        PdfPCell celulaVazia = new PdfPCell(new Phrase(" "));
-        PdfPCell celulaJan = new PdfPCell(new Phrase("Janeiro", font8Bold));
-        PdfPCell celulaFev = new PdfPCell(new Phrase("Fevereiro", font8Bold));
-        PdfPCell celulaMar = new PdfPCell(new Phrase("Março", font8Bold));
-        PdfPCell celulaAbr = new PdfPCell(new Phrase("Abril", font8Bold));
-        PdfPCell celulaMai = new PdfPCell(new Phrase("Maio", font8Bold));
-        PdfPCell celulaJun = new PdfPCell(new Phrase("Junho", font8Bold));
-        PdfPCell celulaJul = new PdfPCell(new Phrase("Julho", font8Bold));
-        PdfPCell celulaAgo = new PdfPCell(new Phrase("Agosto", font8Bold));
-        PdfPCell celulaSet = new PdfPCell(new Phrase("Setembro", font8Bold));
-        PdfPCell celulaOut = new PdfPCell(new Phrase("Outubro", font8Bold));
-        PdfPCell celulaNov = new PdfPCell(new Phrase("Novembro", font8Bold));
-        PdfPCell celulaDez = new PdfPCell(new Phrase("Dezembro", font8Bold));
-        celulaJan.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-        celulaFev.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-        celulaMar.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-        celulaAbr.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-        celulaMai.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-        celulaJun.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-        celulaJul.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-        celulaAgo.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-        celulaSet.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-        celulaOut.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-        celulaNov.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-        celulaDez.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-
-        celulaJan.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celulaFev.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celulaMar.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celulaAbr.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celulaMai.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celulaJun.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celulaJul.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celulaAgo.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celulaSet.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celulaOut.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celulaNov.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celulaDez.setHorizontalAlignment(Element.ALIGN_CENTER);
-
-        celulaVazia.setBorder(PdfPCell.NO_BORDER);
-
+        PdfPCell celulaVazia = criarCelulaVazia();
         tabela.addCell(celulaVazia);
-        tabela.addCell(celulaJan);
-        tabela.addCell(celulaFev);
-        tabela.addCell(celulaMar);
-        tabela.addCell(celulaAbr);
-        tabela.addCell(celulaMai);
-        tabela.addCell(celulaJun);
-        tabela.addCell(celulaJul);
-        tabela.addCell(celulaAgo);
-        tabela.addCell(celulaSet);
-        tabela.addCell(celulaOut);
-        tabela.addCell(celulaNov);
-        tabela.addCell(celulaDez);
-    }
 
-    private void gerarLinhasTabelaSelicAcumulada(LocalDate dataInicial, LocalDate dataFinal, PdfPTable tabela, Font font8, Font font8Bold) {
-        for (Map.Entry<Integer, List<BigDecimal>> entry : this.dictSelicAcumulada.entrySet()) {
-            int ano = entry.getKey();
-            List<BigDecimal> valores = entry.getValue();
+        List<PdfPCell> celulasMeses = criarCelulasCabecalho(font8Bold);
 
-            // Adicionar ano
-            PdfPCell celulaAno = new PdfPCell(new Phrase(String.valueOf(ano), font8Bold));
-            if (ano % 2 == 0) {
-                celulaAno.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-            }
-            celulaAno.setHorizontalAlignment(Element.ALIGN_CENTER);
-            tabela.addCell(celulaAno);
-
-            // Adicionar valores mensais
-            for (int i = 0; i < valores.size(); i++) {
-                BigDecimal valor = valores.get(i);
-                PdfPCell celula = new PdfPCell(new Phrase(valor != null ? String.valueOf(valor) : "", font8));
-                celula.setHorizontalAlignment(Element.ALIGN_CENTER);
-                if (ano % 2 == 0) {
-                    celula.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
-                }
-                //Colorir celulas que sao entre o intervalo da divida do solicitante
-                if ((ano > dataInicial.getYear() || (ano == dataInicial.getYear() && i >= dataInicial.getMonthValue() - 1)) &&
-                        (ano < dataFinal.getYear() || (ano == dataFinal.getYear() && i <= dataFinal.getMonthValue() - 1))) {
-                    celula.setBackgroundColor(new Color(0xFF, 0xFF, 0x00, 0x33));
-                }
-                tabela.addCell(celula); // Adiciona valor ou vazio
-            }
+        for(PdfPCell celulaMes: celulasMeses){
+            tabela.addCell(celulaMes);
         }
     }
 
-    public void extrairSelicAcumulada() {
+    private PdfPCell criarCelulaVazia(){
+        PdfPCell celulaVazia = new PdfPCell(new Phrase(" "));
+        celulaVazia.setBorder(PdfPCell.NO_BORDER);
+        return celulaVazia;
+    }
+
+    private List<PdfPCell> criarCelulasCabecalho(Font font8Bold ){
+        List<String> meses = Arrays.asList("Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+                "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro");
+        List<PdfPCell> celulas = new ArrayList<>();
+
+        for (String mes : meses) {
+            PdfPCell celula = new PdfPCell(new Phrase(mes, font8Bold));
+            celula.setBackgroundColor(new Color(0x69, 0x69, 0x69, 0x33));
+            celula.setHorizontalAlignment(Element.ALIGN_CENTER);
+            celulas.add(celula);
+        }
+
+        return celulas;
+    }
+
+    private List<PdfPCell> gerarLinhasTabelaSelicAcumulada(LocalDate dataInicial, LocalDate dataFinal, Font font8, Font font8Bold) {
+        List<PdfPCell> celulas = new ArrayList<>();
+        Map<Integer, List<BigDecimal>> dictSelicAcumulada = extrairSelicAcumulada();
+
+        for (Map.Entry<Integer, List<BigDecimal>> entry : dictSelicAcumulada.entrySet()) {
+            Integer ano = entry.getKey();
+            List<BigDecimal> valores = entry.getValue();
+
+            PdfPCell celulaAno = criarCelulaAno(ano, font8Bold);
+            celulas.add(celulaAno);
+            // Adicionar valores mensais
+            for (int mes = 0; mes < valores.size(); mes++) {
+                BigDecimal valor = valores.get(mes);
+                PdfPCell celula = criarCelulaValor(valor, font8, ano, mes, dataInicial, dataFinal);
+                celulas.add(celula);
+            }
+        }
+        return celulas;
+    }
+
+    private boolean verificarIntervaloDatas(Integer ano, Integer mes, LocalDate dataInicial, LocalDate dataFinal){
+        if ((ano > dataInicial.getYear() || (ano == dataInicial.getYear() && mes >= dataInicial.getMonthValue() - 1)) &&
+                (ano < dataFinal.getYear() || (ano == dataFinal.getYear() && mes <= dataFinal.getMonthValue() - 1))) {
+            return true;
+        }
+        return false;
+    }
+
+    private PdfPCell criarCelulaAno(Integer ano, Font font8Bold){
+        PdfPCell celulaAno = new PdfPCell(new Phrase(String.valueOf(ano), font8Bold));
+        if (ano % 2 == 0) {
+            celulaAno.setBackgroundColor(COR_CINZA);
+        }
+        celulaAno.setHorizontalAlignment(Element.ALIGN_CENTER);
+        return celulaAno;
+    }
+
+    private PdfPCell criarCelulaValor(BigDecimal valor, Font font8, Integer ano, Integer mes, LocalDate dataInicial, LocalDate dataFinal){
+        PdfPCell celula = new PdfPCell(new Phrase(valor != null ? String.valueOf(valor) : "", font8));
+        celula.setHorizontalAlignment(Element.ALIGN_CENTER);
+        if (ano % 2 == 0) {
+            celula.setBackgroundColor(COR_CINZA);
+        }
+        if(verificarIntervaloDatas(ano, mes, dataInicial, dataFinal)){
+            celula.setBackgroundColor(COR_AMARELO);
+        }
+        return celula;
+    }
+
+    private Map<Integer, List<BigDecimal>> extrairSelicAcumulada() {
+        Map<Integer, List<BigDecimal>> dictSelicAcumulada = new HashMap<>();
         List<SelicAcumuladaDTO> indicesSelicAcumulada = this.selicAcumuladaRepo.buscarTudo();
 
         for (SelicAcumuladaDTO indice : indicesSelicAcumulada) {
-            criarDictSelicAcumulada(indice);
+            criarDictSelicAcumulada(dictSelicAcumulada, indice);
         }
+        return dictSelicAcumulada;
     }
 
-    private void criarDictSelicAcumulada(SelicAcumuladaDTO indice) {
+    private void criarDictSelicAcumulada(Map<Integer, List<BigDecimal>> dictSelicAcumulada, SelicAcumuladaDTO indice) {
+
         Integer ano = indice.data().getYear();
         dictSelicAcumulada.putIfAbsent(ano, new ArrayList<BigDecimal>((Collections.nCopies(12, null))));
         List<BigDecimal> valores = dictSelicAcumulada.get(ano);

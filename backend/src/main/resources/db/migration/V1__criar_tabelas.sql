@@ -13,3 +13,19 @@ create table selic_mes(
 
     primary key(id)
     );
+
+create table fatores_atualizacao(
+        id serial not null,
+        data  date not null unique,
+        valor NUMERIC(18, 15) not null,
+
+        primary key(id)
+);
+
+create table fatores_indices(
+    id serial not null,
+                data  date not null unique,
+                valor NUMERIC(10, 5) not null,
+
+                primary key(id)
+);

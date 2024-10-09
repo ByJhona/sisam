@@ -9,8 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 
-public record SelicAcumuladaDTO(@Column(name = "data")
+public record SelicAcumuladaDTO(
                                 @JsonFormat(pattern = "MMM/yyyy")
                                 LocalDate data,
-                                @Column(name = "valor")
                                 BigDecimal valor) {}

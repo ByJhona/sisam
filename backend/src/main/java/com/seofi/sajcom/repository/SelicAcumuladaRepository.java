@@ -1,9 +1,6 @@
 package com.seofi.sajcom.repository;
 
-import com.seofi.sajcom.domain.SelicAcumulada;
-import com.seofi.sajcom.domain.SelicAcumuladaDTO;
-import com.seofi.sajcom.domain.SelicMes;
-import com.seofi.sajcom.domain.SelicMesDTO;
+import com.seofi.sajcom.domain.*;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -34,11 +31,11 @@ public interface SelicAcumuladaRepository extends JpaRepository<SelicAcumulada, 
     void atualizarValor(SelicAcumulada indice);
 
     @Query("""
-            select new com.seofi.sajcom.domain.SelicAcumuladaDTO(indice.data, indice.valor) from SelicAcumulada indice
+            select new com.seofi.sajcom.domain.Indice(indice.data, indice.valor) from SelicAcumulada indice
             where
             data >= :dataInicial and data <= :dataFinal
             """)
-    List<SelicAcumuladaDTO> buscarIntervalo(LocalDate dataInicial, LocalDate dataFinal);
+    List<Indice> buscarIntervalo(LocalDate dataInicial, LocalDate dataFinal);
 
     @Query("""
             select new com.seofi.sajcom.domain.SelicAcumuladaDTO(indice.data, indice.valor) from SelicAcumulada indice

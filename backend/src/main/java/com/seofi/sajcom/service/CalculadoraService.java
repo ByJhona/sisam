@@ -23,21 +23,53 @@ public class CalculadoraService {
         LocalDate dataInicial = divida.getDataInicial();
         LocalDate dataFinal = divida.getDataFinal();
         BigDecimal valor = divida.getValor();
-        List<SelicAcumuladaDTO> intervaloDatas = this.util.buscarIntervaloDatas(dataInicial, dataFinal);
-        BigDecimal total = calcularMontanteTotal(valor, intervaloDatas);
 
-        return new DividaDTO(valor, total, dataInicial, dataFinal, intervaloDatas);
+        System.out.println("OI");
+        BigDecimal total = calcularMontanteTotal(dataInicial, dataFinal, valor);
+
+        return new DividaDTO(valor, total, dataInicial, dataFinal,new ArrayList<Indice>());
     }
 
-    private BigDecimal calcularMontanteTotal( BigDecimal total, List<SelicAcumuladaDTO> intervaloDatas){
+    public List<Indice> testar(Divida divida) {
+        LocalDate dataInicial = divida.getDataInicial();
+        LocalDate dataFinal = divida.getDataFinal();
+        BigDecimal valor = divida.getValor();
+        return this.util.intervaloFatorIndice(dataInicial, dataFinal);
+
+    }
+
+    private BigDecimal calcularMontanteTotal( LocalDate dataInicial, LocalDate dataFinal, BigDecimal valor){
+
+        List<Indice> indicesSelicAcumulada = this.util.intervaloSelicAcumulada(dataInicial, dataFinal);
+        List<Indice> indicesFatorIndice = this.util.intervaloFatorIndice(dataInicial, dataFinal);
+
+        BigDecimal valorResponse = calcularFatores(dataInicial, valor);
+
+
         BigDecimal jurosAcumulado = BigDecimal.ZERO;
 
-        for (SelicAcumuladaDTO indice : intervaloDatas){
-            BigDecimal aux = total.multiply(indice.valor());
-            jurosAcumulado = jurosAcumulado.add(aux);
-            System.out.println(jurosAcumulado);
-        }
-        return total.add(jurosAcumulado);
+
+        return valor.add(jurosAcumulado);
     }
+
+    private BigDecimal calcularFatores(LocalDate data, BigDecimal valor){
+        Indice indiceFatorAtualizacao = this.util.indiceFatorAtualizacao(data);
+        Indice indiceFatorIndice = this.util.indiceFatorIndice(data);
+
+        if(indiceFatorAtualizacao != null && indiceFatorIndice != null){
+            BigDecimal coefFatorAtualizacao = indiceFatorAtualizacao.valor();
+            BigDecimal taxaFatorIndice = (indiceFatorIndice.valor().divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP));
+            BigDecimal valorFatorAtualizacao = valor.multiply(coefFatorAtualizacao);
+            BigDecimal valorJurosFatorIndice = valorFatorAtualizacao.multiply(taxaFatorIndice);
+            BigDecimal valorTotal = valorFatorAtualizacao.add(valorJurosFatorIndice);
+            valorTotal = valorTotal.setScale(2, RoundingMode.HALF_UP);
+            return valorTotal;
+        }
+
+        return valor;
+    }
+
+
+
 
 }
