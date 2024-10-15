@@ -9,5 +9,5 @@ import { Component, Input } from '@angular/core';
 })
 export class CardComponent {
   @Input() titulo!: string
-  @Input() valor!: number
+  @Input() valor!: string
 }

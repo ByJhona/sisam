@@ -18,6 +18,14 @@ export class DividaCalculada {
         this.indices = indices
     }
 
+    getValorInicial(){
+        return this.valorInicial.toLocaleString("pt-BR");
+    }
+
+    getValorFinal(){
+        return this.valorFinal.toLocaleString("pt-BR");
+    }
+
 
 }
 
