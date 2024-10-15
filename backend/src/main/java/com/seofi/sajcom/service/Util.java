@@ -32,6 +32,13 @@ public class Util {
         return intervaloIndices;
     }
 
+    public List<Indice> intervaloSelicMes(LocalDate dataInicial, LocalDate dataFinal) {
+        validarDataInicialFinal(dataInicial, dataFinal);
+        List<Indice> intervaloIndices = this.selicMesRepo.buscarIntervalo(dataInicial, dataFinal);
+        validarIntervaloDatas(dataInicial, dataFinal, intervaloIndices);
+        return intervaloIndices;
+    }
+
     public List<Indice> intervaloFatorAtualizacao(LocalDate dataInicial, LocalDate dataFinal) {
         validarDataInicialFinal(dataInicial, dataFinal);
         List<Indice> intervaloIndices = this.fatorAtualizacaoRepo.buscarIntervalo(dataInicial, dataFinal);

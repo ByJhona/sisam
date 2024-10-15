@@ -24,10 +24,9 @@ public class CalculadoraService {
         LocalDate dataFinal = divida.getDataFinal();
         BigDecimal valor = divida.getValor();
 
-        System.out.println("OI");
         BigDecimal total = calcularMontanteTotal(dataInicial, dataFinal, valor);
 
-        return new DividaDTO(valor, total, dataInicial, dataFinal,new ArrayList<Indice>());
+        return new DividaDTO(valor, total, dataInicial, dataFinal, new ArrayList<Indice>());
     }
 
     public List<Indice> testar(Divida divida) {
@@ -35,41 +34,44 @@ public class CalculadoraService {
         LocalDate dataFinal = divida.getDataFinal();
         BigDecimal valor = divida.getValor();
         return this.util.intervaloFatorIndice(dataInicial, dataFinal);
-
     }
 
-    private BigDecimal calcularMontanteTotal( LocalDate dataInicial, LocalDate dataFinal, BigDecimal valor){
-
-        List<Indice> indicesSelicAcumulada = this.util.intervaloSelicAcumulada(dataInicial, dataFinal);
-        List<Indice> indicesFatorIndice = this.util.intervaloFatorIndice(dataInicial, dataFinal);
-
-        BigDecimal valorResponse = calcularFatores(dataInicial, valor);
-
-
-        BigDecimal jurosAcumulado = BigDecimal.ZERO;
-
-
-        return valor.add(jurosAcumulado);
+    //Refatorar pq achei estranho, falta algo, um plus, um negocinho
+    private BigDecimal calcularMontanteTotal(LocalDate dataInicial, LocalDate dataFinal, BigDecimal valor) {
+        BigDecimal valorCalculadoFatores = calcularValoresFatores(dataInicial, valor);
+        return calcularValoresSelic(dataInicial, dataFinal, valorCalculadoFatores);
     }
 
-    private BigDecimal calcularFatores(LocalDate data, BigDecimal valor){
+    private BigDecimal calcularValoresSelic(LocalDate dataInicial, LocalDate dataFinal, BigDecimal valor) {
+        List<Indice> indicesSelicAcumulada = this.util.intervaloSelicMes(dataInicial, dataFinal);
+        BigDecimal taxaAcumulada = BigDecimal.ZERO;
+
+        for (Indice indice : indicesSelicAcumulada) {
+            BigDecimal valorMes = indice.valor();
+            BigDecimal taxaMes = valorMes.divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP);
+            taxaAcumulada = taxaAcumulada.add(taxaMes);
+        }
+        BigDecimal valorTaxaCalculada = valor.multiply(taxaAcumulada);
+        return valor.add(valorTaxaCalculada);
+    }
+
+    private BigDecimal calcularValoresFatores(LocalDate data, BigDecimal valor) {
         Indice indiceFatorAtualizacao = this.util.indiceFatorAtualizacao(data);
         Indice indiceFatorIndice = this.util.indiceFatorIndice(data);
 
-        if(indiceFatorAtualizacao != null && indiceFatorIndice != null){
+        if (indiceFatorAtualizacao != null && indiceFatorIndice != null) {
             BigDecimal coefFatorAtualizacao = indiceFatorAtualizacao.valor();
             BigDecimal taxaFatorIndice = (indiceFatorIndice.valor().divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP));
             BigDecimal valorFatorAtualizacao = valor.multiply(coefFatorAtualizacao);
             BigDecimal valorJurosFatorIndice = valorFatorAtualizacao.multiply(taxaFatorIndice);
             BigDecimal valorTotal = valorFatorAtualizacao.add(valorJurosFatorIndice);
-            valorTotal = valorTotal.setScale(2, RoundingMode.HALF_UP);
-            return valorTotal;
+            System.out.println(valorTotal);
+
+            return valorTotal.setScale(2, RoundingMode.HALF_UP);
         }
 
         return valor;
     }
-
-
 
 
 }

@@ -24,7 +24,7 @@ public class AtualizarSelicAcumulada {
     private SelicAcumuladaRepository selicAcumuladaRepo;
     private static final String TIME_ZONE = "America/Sao_Paulo";
 
-    @Scheduled(zone = TIME_ZONE, cron = "0 35 * * * ?")
+    @Scheduled(zone = TIME_ZONE, cron = "0 39 * * * ?")
     @Transactional
     public void atualizarIndicesSelicAcumulada() {
         List<SelicMesDTO> indicesSelicDTO = this.selicMesRepo.buscarIndices();
