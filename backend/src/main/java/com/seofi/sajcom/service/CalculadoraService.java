@@ -18,11 +18,13 @@ public class CalculadoraService {
     public DividaCalculadaDTO calcularDivida(Divida divida) {
         LocalDate dataInicial = divida.getDataInicial();
         LocalDate dataFinal = divida.getDataFinal();
+        dataFinal = dataFinal.minusMonths(1);
         BigDecimal valor = divida.getValor();
         BigDecimal valorTotalCalculado =  calcularMontanteTotal(dataInicial, dataFinal, valor);
         List<Indice> listaIndices = obterListaIndices(dataInicial, dataFinal);
+        System.out.println(listaIndices);
 
-       return new DividaCalculadaDTO(valor, valorTotalCalculado, dataInicial, dataFinal, new ArrayList<>());
+       return new DividaCalculadaDTO(valor, valorTotalCalculado, dataInicial, dataFinal, listaIndices);
     }
 
     private BigDecimal calcularMontanteTotal(LocalDate dataInicial, LocalDate dataFinal, BigDecimal valor) {
@@ -35,8 +37,14 @@ public class CalculadoraService {
     }
 
     private List<Indice> obterListaIndices(LocalDate dataInicial, LocalDate dataFinal){
+        Indice indiceFatorAtualizacao = this.util.indiceFatorAtualizacao(dataInicial);
+        Indice indiceFatorIndice = this.util.indiceFatorIndice(dataInicial);
+        List<Indice> indicesSelicMes = this.util.intervaloSelicAcumulada(dataInicial, dataFinal);
+        List<Indice> lista  = new ArrayList<>();
+        lista.addAll(indicesSelicMes);
 
-        return new ArrayList<>();
+
+        return lista;
     }
 
     private BigDecimal calcularValoresSelic(BigDecimal valor, List<Indice> indicesSelicMes) {
