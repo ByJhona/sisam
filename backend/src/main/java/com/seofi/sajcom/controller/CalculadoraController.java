@@ -1,9 +1,9 @@
 package com.seofi.sajcom.controller;
 
 import com.seofi.sajcom.domain.Divida;
-import com.seofi.sajcom.domain.DividaDTO;
-import com.seofi.sajcom.domain.FatoresAtualizacaoDTO;
+import com.seofi.sajcom.domain.DividaCalculadaDTO;
 import com.seofi.sajcom.domain.Indice;
+import com.seofi.sajcom.domain.Indices;
 import com.seofi.sajcom.service.CalculadoraService;
 import com.seofi.sajcom.service.Relatorio;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,18 +28,13 @@ public class CalculadoraController {
 
 
     @GetMapping("calcular")
-    public ResponseEntity<DividaDTO> mostrarResultado(@RequestParam  BigDecimal valor, @RequestParam  LocalDate dataInicial, @RequestParam  LocalDate dataFinal) throws IOException {
+    public ResponseEntity<DividaCalculadaDTO> mostrarResultado(@RequestParam  BigDecimal valor, @RequestParam  LocalDate dataInicial, @RequestParam  LocalDate dataFinal) throws IOException {
         Divida divida = new Divida(valor, dataInicial, dataFinal);
-        DividaDTO dividaDTO = this.calculadoraServ.calcularDivida(divida);
-        return ResponseEntity.ok().body(dividaDTO);
+        DividaCalculadaDTO dividaCalculadaDTO = this.calculadoraServ.calcularDivida(divida);
+        return ResponseEntity.ok().body(dividaCalculadaDTO);
+
     }
 
-    @GetMapping("teste")
-    public ResponseEntity<List<Indice>> teste1(@RequestParam  BigDecimal valor, @RequestParam  LocalDate dataInicial, @RequestParam  LocalDate dataFinal) throws IOException {
-        Divida divida = new Divida(valor, dataInicial, dataFinal);
-        List<Indice> fator = this.calculadoraServ.testar(divida);
-        return ResponseEntity.ok().body(fator);
-    }
 
     @GetMapping("baixar-relatorio")
     public ResponseEntity<byte[]> baixarRelatorio(@RequestParam  LocalDate dataInicial, @RequestParam  LocalDate dataFinal) throws IOException {

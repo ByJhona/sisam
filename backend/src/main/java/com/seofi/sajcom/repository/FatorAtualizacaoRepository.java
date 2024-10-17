@@ -1,7 +1,6 @@
 package com.seofi.sajcom.repository;
 
 import com.seofi.sajcom.domain.FatorAtualizacao;
-import com.seofi.sajcom.domain.FatoresAtualizacaoDTO;
 import com.seofi.sajcom.domain.Indice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -1,3 +1,8 @@
+insert into tipo (descricao) values('Selic Acumulada');
+insert into tipo (descricao) values('Selic Mes');
+insert into tipo (descricao) values('Fator atualizacao');
+insert into tipo (descricao) values('Fator indice');
+
 
 insert into fatores_atualizacao (data, valor) values('1994-01-01', 0.02305523074029);
 insert into fatores_atualizacao (data, valor) values('1994-02-01', 0.01631420233533);

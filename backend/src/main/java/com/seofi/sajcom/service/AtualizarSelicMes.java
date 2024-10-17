@@ -1,11 +1,13 @@
 package com.seofi.sajcom.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.seofi.sajcom.domain.SelicAcumulada;
+import com.seofi.sajcom.domain.Indices;
 import com.seofi.sajcom.domain.SelicMes;
-import com.seofi.sajcom.domain.SelicMesDTO;
+import com.seofi.sajcom.domain.Tipo;
+import com.seofi.sajcom.repository.IndiceRepository;
 import com.seofi.sajcom.repository.SelicAcumuladaRepository;
 import com.seofi.sajcom.repository.SelicMesRepository;
+import com.seofi.sajcom.repository.TipoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -24,38 +26,45 @@ public class AtualizarSelicMes {
     @Autowired
     private SelicMesRepository selicMesRepo;
     @Autowired
+    private IndiceRepository indiceRepo;
+    @Autowired
+    private TipoRepository tipoRepo;
+    @Autowired
     private SelicAcumuladaRepository selicAcumuladaRepo;
     @Autowired
     private BacenAPI bacenAPI;
     private static final String TIME_ZONE = "America/Sao_Paulo";
 
 
-    @Scheduled(zone = TIME_ZONE, cron = "0 35 * * * ?")
+    @Scheduled(zone = TIME_ZONE, cron = "59 * * * * ?")
     @Transactional
     public void filtrarIndicesSelic() throws JsonProcessingException {
         LocalDate dataInicialSelicRef = LocalDate.of(2021, 11, 1);
         LocalDate dataFinalSelicRef = LocalDate.now().withDayOfMonth(1);
         List<SelicMes> indicesAPI = bacenAPI.getIndices();
-        List<SelicMes> indicesDoBanco = selicMesRepo.findAll();
-        List<SelicMes> novosIndices = new ArrayList<>();
+        //List<SelicMes> indicesDoBanco = selicMesRepo.findAll();
+        List<Indices> novosIndices = new ArrayList<>();
+        Tipo tipo = tipoRepo.buscarTipo(EnumTipo.Mes.obterTipo());
+        List<Indices>  indicesDoBanco = indiceRepo.buscarTodosSelicMes(tipo);
+
 
         for (SelicMes indice : indicesAPI) {
             LocalDate dataIndice = indice.getData();
             boolean existeNoBanco = verificarExisteNoBanco(indicesDoBanco, indice);
             if (!existeNoBanco && dataInicialSelicRef.isBefore(dataIndice) && dataFinalSelicRef.isAfter(dataIndice)) {
                 BigDecimal valor = indice.getValor().setScale(6, RoundingMode.HALF_UP);
-                SelicMes novoSelicMes = new SelicMes(indice.getData(), valor);
+                Indices novoSelicMes = new Indices(indice.getData(), valor, tipo);
                 novosIndices.add(novoSelicMes);
             }
         }
         if (!novosIndices.isEmpty()) {
-            this.selicMesRepo.saveAll(novosIndices);
+            this.indiceRepo.saveAll(novosIndices);
         }
 
         System.out.println("Selic mes atualizada.");
     }
  // private
-    public boolean verificarExisteNoBanco(List<SelicMes> indicesDoBanco, SelicMes indice) {
+    public boolean verificarExisteNoBanco(List<Indices> indicesDoBanco, SelicMes indice) {
         return indicesDoBanco.stream().anyMatch(indiceDoBanco -> indiceDoBanco.getData().isEqual(indice.getData()));
     }
 }

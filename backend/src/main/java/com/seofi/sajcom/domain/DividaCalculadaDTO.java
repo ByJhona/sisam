@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-public record DividaDTO(
+public record DividaCalculadaDTO(
         BigDecimal valorInicial,
         BigDecimal valorFinal,
         @JsonFormat(pattern = "yyyy-MM-dd")

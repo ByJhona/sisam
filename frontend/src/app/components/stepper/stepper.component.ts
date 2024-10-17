@@ -51,6 +51,7 @@ isLoading = false;
   dataSource = new MatTableDataSource<Indice>();
   dividaCalculada: DividaCalculada = new DividaCalculada();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+  
   infoDivida = this._formBuilder.group({
     valor: ['', Validators.required],
     mesInicial: ['', Validators.required],
@@ -144,6 +145,7 @@ isLoading = false;
   enviarApi(divida: Divida, stepper:MatStepper): void {
     this.calculadoraService.enviarDados(divida).subscribe((result) => {
       this.dataSource.data = result.indices;
+      console.log(this.dataSource.data)
       this.dividaCalculada = new DividaCalculada(result.valorInicial, result.valorFinal, result.dataInicial, result.dataFinal, result.indices);
 
       this.dataInicial = formatarMesAno(this.dividaCalculada.dataInicial)

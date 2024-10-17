@@ -1,9 +1,10 @@
 package com.seofi.sajcom.service;
 
-import com.seofi.sajcom.domain.SelicAcumulada;
-import com.seofi.sajcom.domain.SelicMesDTO;
+import com.seofi.sajcom.domain.*;
+import com.seofi.sajcom.repository.IndiceRepository;
 import com.seofi.sajcom.repository.SelicAcumuladaRepository;
 import com.seofi.sajcom.repository.SelicMesRepository;
+import com.seofi.sajcom.repository.TipoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -21,22 +22,28 @@ public class AtualizarSelicAcumulada {
     @Autowired
     private SelicMesRepository selicMesRepo;
     @Autowired
+    private TipoRepository tipoRepo;
+    @Autowired
+    private IndiceRepository indiceRepo;
+    @Autowired
     private SelicAcumuladaRepository selicAcumuladaRepo;
     private static final String TIME_ZONE = "America/Sao_Paulo";
 
-    @Scheduled(zone = TIME_ZONE, cron = "0 39 * * * ?")
+    @Scheduled(zone = TIME_ZONE, cron = "30 * * * * ?")
     @Transactional
     public void atualizarIndicesSelicAcumulada() {
-        List<SelicMesDTO> indicesSelicDTO = this.selicMesRepo.buscarIndices();
+        Tipo tipoMes = tipoRepo.buscarTipo(EnumTipo.Mes.obterTipo());
+        Tipo tipoAcumulado = tipoRepo.buscarTipo(EnumTipo.Acumulada.obterTipo());
+        List<Indices> indicesSelicDTO = indiceRepo.buscarTodosSelicMes(tipoMes);
         BigDecimal valorSelicAcumulado = BigDecimal.ZERO;
 
-        for (SelicMesDTO indice : indicesSelicDTO) {
-            BigDecimal valor = indice.valor().divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP);
-            LocalDate data = indice.data();
+        for (Indices indice : indicesSelicDTO) {
+            BigDecimal valor = indice.getValor().divide(BigDecimal.valueOf(100), 6, RoundingMode.HALF_UP);
+            LocalDate data = indice.getData();
             valorSelicAcumulado = valorSelicAcumulado.add(valor).setScale(6, RoundingMode.HALF_UP);
-            SelicAcumulada indiceAcumulado = new SelicAcumulada(data, valorSelicAcumulado);
+            Indices indiceAcumulado = new Indices(data, valorSelicAcumulado, tipoAcumulado);
 
-            this.selicAcumuladaRepo.atualizarValor(indiceAcumulado);
+            this.indiceRepo.atualizarSelicAcumulada(indiceAcumulado);
         }
         System.out.println("Selic acumulada atualizada.");
 
