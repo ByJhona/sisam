@@ -1,4 +1,5 @@
 export interface Indice{
     data: Date,
-    valor: number
+    valor: number,
+    tipo: string
 }
