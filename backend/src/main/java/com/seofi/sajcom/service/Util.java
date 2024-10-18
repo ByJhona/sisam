@@ -2,90 +2,49 @@ package com.seofi.sajcom.service;
 
 import com.seofi.sajcom.domain.*;
 import com.seofi.sajcom.exception.IntervaloDatasInvalido;
-import com.seofi.sajcom.repository.FatorAtualizacaoRepository;
-import com.seofi.sajcom.repository.FatorIndiceRepository;
-import com.seofi.sajcom.repository.SelicAcumuladaRepository;
-import com.seofi.sajcom.repository.SelicMesRepository;
+import com.seofi.sajcom.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
 public class Util {
     @Autowired
-    private SelicMesRepository selicMesRepo;
+    private IndiceRepository indiceRepo;
     @Autowired
-    private FatorAtualizacaoRepository fatorAtualizacaoRepo;
-    @Autowired
-    private FatorIndiceRepository fatorIndiceRepo;
-    @Autowired
-    private SelicAcumuladaRepository selicAcumuladaRepo;
-    @Autowired
-    private BacenAPI bacenAPI;
+    private TipoRepository tipoRepo;
 
-    public List<Indice> intervaloSelicAcumulada(LocalDate dataInicial, LocalDate dataFinal) {
+
+    public List<Indices> buscarIntervaloIndices(LocalDate dataInicial, LocalDate dataFinal, EnumTipo tipo ) {
+        Tipo tipoBanco = tipoRepo.buscarTipo(tipo.obterTipo());
         validarDataInicialFinal(dataInicial, dataFinal);
-        List<Indice> intervaloIndices = this.selicAcumuladaRepo.buscarIntervalo(dataInicial, dataFinal);
+        List<Indices> intervaloIndices = this.indiceRepo.buscarIndicesIntervalo(dataInicial, dataFinal, tipoBanco);
         validarIntervaloDatas(dataInicial, dataFinal, intervaloIndices);
         return intervaloIndices;
     }
 
-    public List<Indice> intervaloSelicMes(LocalDate dataInicial, LocalDate dataFinal) {
-        validarDataInicialFinal(dataInicial, dataFinal);
-        List<Indice> intervaloIndices = this.selicMesRepo.buscarIntervalo(dataInicial, dataFinal);
-        validarIntervaloDatas(dataInicial, dataFinal, intervaloIndices);
-        return intervaloIndices;
+    public Indices buscarIndice(LocalDate data, EnumTipo tipoEnum){
+        Tipo tipo = tipoRepo.buscarTipo(tipoEnum.obterTipo());
+        return this.indiceRepo.buscarIndice(data, tipo);
     }
 
-    public List<Indice> intervaloFatorAtualizacao(LocalDate dataInicial, LocalDate dataFinal) {
-        validarDataInicialFinal(dataInicial, dataFinal);
-        List<Indice> intervaloIndices = this.fatorAtualizacaoRepo.buscarIntervalo(dataInicial, dataFinal);
-        validarIntervaloDatas(dataInicial, dataFinal, intervaloIndices);
-        return intervaloIndices;
+    public Tipo buscarTipo(String descricao){
+        return this.tipoRepo.buscarTipo(descricao);
     }
 
-    public Indice indiceFatorAtualizacao(LocalDate data) {
-        return this.fatorAtualizacaoRepo.buscarIndice(data);
-    }
-    public Indice indiceFatorIndice(LocalDate data) {
-        return this.fatorIndiceRepo.buscarIndice(data);
-    }
-
-    public List<Indice> intervaloFatorIndice(LocalDate dataInicial, LocalDate dataFinal) {
-        validarDataInicialFinal(dataInicial, dataFinal);
-        List<Indice> intervaloIndices = this.fatorIndiceRepo.buscarIntervalo(dataInicial, dataFinal);
-        validarIntervaloDatas(dataInicial, dataFinal, intervaloIndices);
-        return intervaloIndices;
-    }
-
-    private void validarIntervaloDatas(LocalDate dataInicial, LocalDate dataFinal, List<Indice> intervaloIndices){
+    private void validarIntervaloDatas(LocalDate dataInicial, LocalDate dataFinal, List<Indices> intervaloIndices) {
         intervaloIndices.forEach(indice -> {
-            if((indice.data().isEqual(dataInicial) || indice.data().isEqual(dataFinal)) || (indice.data().isAfter(dataInicial) && indice.data().isBefore(dataFinal))){
-
-            }else{
+            if (!((indice.getData().isEqual(dataInicial) || indice.getData().isEqual(dataFinal)) || (indice.getData().isAfter(dataInicial) && indice.getData().isBefore(dataFinal)))) {
                 throw new IntervaloDatasInvalido();
             }
         });
     }
 
-    private void validarDataInicialFinal(LocalDate dataInicial, LocalDate dataFinal){
-        if(dataInicial.isAfter(dataFinal) || dataFinal.isBefore(dataInicial)){
+    private void validarDataInicialFinal(LocalDate dataInicial, LocalDate dataFinal) {
+        if (dataInicial.isAfter(dataFinal) || dataFinal.isBefore(dataInicial)) {
             throw new IntervaloDatasInvalido();
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

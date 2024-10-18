@@ -1,7 +1,7 @@
 insert into tipo (descricao) values('Selic Acumulada');
 insert into tipo (descricao) values('Selic Mes');
-insert into tipo (descricao) values('Fator atualizacao');
-insert into tipo (descricao) values('Fator indice');
+insert into tipo (descricao) values('Fator Atualizacao');
+insert into tipo (descricao) values('Fator Indice');
 
 
 -- ----------------------------------- Fator indice
@@ -343,6 +343,7 @@ insert into indices (data, valor, id_tipo) values('2021-10-01', 0.8824, 4);
 insert into indices (data, valor, id_tipo) values('2021-11-01', 0.4412, 4);
 
 
+
 ---------------------------------------------------------------- Indices fator atualização
 
 
@@ -681,3 +682,4 @@ insert into indices (data, valor, id_tipo) values('2021-08-01', 1.04472823896698
 insert into indices (data, valor, id_tipo) values('2021-09-01', 1.03551218056, 3);
 insert into indices (data, valor, id_tipo) values('2021-10-01', 1.0238404, 3);
 insert into indices (data, valor, id_tipo) values('2021-11-01', 1.0117, 3);
+

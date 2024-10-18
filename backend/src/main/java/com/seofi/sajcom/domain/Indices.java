@@ -38,4 +38,9 @@ public class Indices {
         this.tipo = tipo;
     }
 
+    @Override
+    public String toString() {
+        return "Valor: " + this.valor + " Data: " + this.data + " Tipo: " + this.tipo;
+    }
+
 }

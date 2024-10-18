@@ -23,4 +23,9 @@ public class Tipo {
     public Tipo(String descricao) {
         this.descricao = descricao;
     }
+    @Override
+    public String toString() {
+        return this.descricao;
+    }
+
 }

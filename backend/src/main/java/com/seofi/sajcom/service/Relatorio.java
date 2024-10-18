@@ -13,7 +13,7 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfString;
 import com.lowagie.text.pdf.PdfWriter;
 import com.seofi.sajcom.domain.SelicAcumuladaDTO;
-import com.seofi.sajcom.repository.SelicAcumuladaRepository;
+import com.seofi.sajcom.repository.IndiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.awt.*;
@@ -27,7 +27,7 @@ import java.util.List;
 @Service
 public class Relatorio {
     @Autowired
-    private SelicAcumuladaRepository selicAcumuladaRepo;
+    private IndiceRepository indiceRepo;
     private static final Color COR_CINZA = new Color(0x69, 0x69, 0x69, 0x33);
     private static final Color COR_AMARELO = new Color(0xFF, 0xFF, 0x00, 0x33);
     private static final Font font8 = FontFactory.getFont(FontFactory.HELVETICA, 8);
@@ -172,7 +172,7 @@ public class Relatorio {
 
     private Map<Integer, List<BigDecimal>> extrairSelicAcumulada() {
         Map<Integer, List<BigDecimal>> dictSelicAcumulada = new HashMap<>();
-        List<SelicAcumuladaDTO> indicesSelicAcumulada = this.selicAcumuladaRepo.buscarTudo();
+        List<SelicAcumuladaDTO> indicesSelicAcumulada = new ArrayList<>();
 
         for (SelicAcumuladaDTO indice : indicesSelicAcumulada) {
             criarDictSelicAcumulada(dictSelicAcumulada, indice);
