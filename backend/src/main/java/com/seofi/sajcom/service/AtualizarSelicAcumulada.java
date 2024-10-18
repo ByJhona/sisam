@@ -29,10 +29,10 @@ public class AtualizarSelicAcumulada {
     @Transactional
     public void atualizarIndicesSelicAcumulada() {
         Tipo tipoAcumulado = this.util.buscarTipo(EnumTipo.Acumulada.obterTipo());
-        List<Indices> indicesSelicDTO = buscarIndices();
+        List<Indice> indicesSelicDTO = buscarIndices();
         BigDecimal valorSelicAcumulado = BigDecimal.ONE;
 
-        for (Indices indice : indicesSelicDTO) {
+        for (Indice indice : indicesSelicDTO) {
             valorSelicAcumulado = calcular(indice, valorSelicAcumulado);
             salvar(indice, valorSelicAcumulado, tipoAcumulado);
         }
@@ -40,21 +40,21 @@ public class AtualizarSelicAcumulada {
 
     }
 
-    private BigDecimal calcular(Indices indice, BigDecimal valorAcumulado) {
+    private BigDecimal calcular(Indice indice, BigDecimal valorAcumulado) {
         BigDecimal valor = indice.getValor().divide(CEM,  RoundingMode.HALF_UP);
         return valorAcumulado.add(valor);
     }
 
-    private void salvar(Indices indice, BigDecimal valor, Tipo tipo) {
+    private void salvar(Indice indice, BigDecimal valor, Tipo tipo) {
         if (indice.getData() != null && valor != null) {
-            Indices indiceNovo = new Indices(indice.getData(), valor, tipo);
+            Indice indiceNovo = new Indice(indice.getData(), valor, tipo);
             this.indiceRepo.atualizarSelicAcumulada(indiceNovo);
         }
     }
 
-    private List<Indices> buscarIndices() {
+    private List<Indice> buscarIndices() {
         Tipo tipoMes = tipoRepo.buscarTipo(EnumTipo.Mes.obterTipo());
-        List<Indices> indices = indiceRepo.buscarIndices(tipoMes);
+        List<Indice> indices = indiceRepo.buscarIndices(tipoMes);
         indices.sort((indice1, indice2) -> indice2.getData().compareTo(indice1.getData()));
         return indices;
 

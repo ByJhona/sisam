@@ -13,5 +13,5 @@ public record DividaCalculadaDTO(
         LocalDate dataInicial,
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate dataFinal,
-        List<Indices> indices
+        List<IndiceDTO> indices
 ) { }

@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 @Table(name = "indice")
-public class Indices {
+public class Indice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,7 +31,7 @@ public class Indices {
     @ManyToOne // Relacionamento com Tipo
     private Tipo tipo;
 
-    public Indices(LocalDate data, BigDecimal valor, Tipo tipo){
+    public Indice(LocalDate data, BigDecimal valor, Tipo tipo){
         this.id = null;
         this.data = data;
         this.valor = valor;

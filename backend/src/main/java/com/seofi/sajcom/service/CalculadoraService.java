@@ -25,13 +25,13 @@ public class CalculadoraService {
         LocalDate dataFinal = divida.getDataFinal();
         BigDecimal valor = divida.getValor();
         BigDecimal valorTotalCalculado = calcularMontanteTotal(dataInicial, dataFinal, valor);
-        List<Indices> indices = buscarIndices(dataInicial, dataFinal);
+        List<IndiceDTO> indices = buscarIndices(dataInicial, dataFinal);
         return new DividaCalculadaDTO(valor, valorTotalCalculado, dataInicial, dataFinal, indices);
     }
 
-    private List<Indices> buscarIndices(LocalDate dataInicial, LocalDate dataFinal) {
-        List<Indices> indicesSelic = this.util.buscarIntervaloIndices(dataInicial, dataFinal, EnumTipo.Acumulada);
-        List<Indices> indices = new ArrayList<Indices>();
+    private List<IndiceDTO> buscarIndices(LocalDate dataInicial, LocalDate dataFinal) {
+        List<Indice> indicesSelic = this.util.buscarIntervaloIndices(dataInicial, dataFinal, EnumTipo.Acumulada);
+        List<Indice> indices = new ArrayList<Indice>();
 
         adicionarFatores(dataInicial, indices, EnumTipo.Atualizacao, EnumTipo.Indice);
 
@@ -39,15 +39,14 @@ public class CalculadoraService {
             indices.addAll(indicesSelic);
         }
         ordenarIndicesPorData(indices);
-
-        return indices;
+        return this.util.converterIndicesParaDTO(indices);
     }
-    private void ordenarIndicesPorData(List<Indices> indices) {
-        indices.sort(Comparator.comparing(Indices::getData).reversed());
+    private void ordenarIndicesPorData(List<Indice> indices) {
+        indices.sort(Comparator.comparing(Indice::getData).reversed());
     }
-    private void adicionarFatores(LocalDate dataInicial, List<Indices> indices, EnumTipo... tipos) {
+    private void adicionarFatores(LocalDate dataInicial, List<Indice> indices, EnumTipo... tipos) {
         for (EnumTipo tipo : tipos) {
-            Indices indice = util.buscarIndice(dataInicial, tipo);
+            Indice indice = util.buscarIndice(dataInicial, tipo);
             if (indice != null) {
                 indices.add(indice);
             }
@@ -67,13 +66,13 @@ public class CalculadoraService {
     }
 
     private BigDecimal calculoValorFatores(LocalDate data, BigDecimal valor) {
-        Indices indiceFatorAtualizacao = util.buscarIndice(data, EnumTipo.Atualizacao);
-        Indices indiceFatorIndice = util.buscarIndice(data, EnumTipo.Indice);
+        Indice indiceFatorAtualizacao = util.buscarIndice(data, EnumTipo.Atualizacao);
+        Indice indiceFatorIndice = util.buscarIndice(data, EnumTipo.Indice);
 
         return calcularValorFatoresNOVO(valor, indiceFatorAtualizacao, indiceFatorIndice);
     }
 
-    private BigDecimal calcularValorFatoresNOVO(BigDecimal valor, Indices indiceFatorAtualizacao, Indices indiceFatorIndice) {
+    private BigDecimal calcularValorFatoresNOVO(BigDecimal valor, Indice indiceFatorAtualizacao, Indice indiceFatorIndice) {
 
         if (indiceFatorAtualizacao == null || indiceFatorIndice == null) {
             return valor;
@@ -88,13 +87,13 @@ public class CalculadoraService {
     }
 
     private BigDecimal calculoValorSelicAcumulada(LocalDate dataInicial, LocalDate dataFinal, BigDecimal valor) {
-        Indices indiceInicial = util.buscarIndice(dataInicial, EnumTipo.Acumulada);
-        Indices indiceFinal = util.buscarIndice(dataFinal, EnumTipo.Acumulada);
+        Indice indiceInicial = util.buscarIndice(dataInicial, EnumTipo.Acumulada);
+        Indice indiceFinal = util.buscarIndice(dataFinal, EnumTipo.Acumulada);
 
         return calcularValoresSelicAcumulada(valor, indiceInicial, indiceFinal);
     }
 
-    private BigDecimal calcularValoresSelicAcumulada(BigDecimal valor, Indices indiceInicial, Indices indiceFinal) {
+    private BigDecimal calcularValoresSelicAcumulada(BigDecimal valor, Indice indiceInicial, Indice indiceFinal) {
         BigDecimal taxaInicial = indiceInicial.getValor();
         BigDecimal taxaFinal = indiceFinal.getValor();
         BigDecimal taxa = taxaInicial.subtract(taxaFinal);

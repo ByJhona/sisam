@@ -1,7 +1,6 @@
 package com.seofi.sajcom.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -15,10 +14,8 @@ import java.time.format.DateTimeParseException;
 
 @Setter
 @Getter
-@Entity
-@Table(name = "selic_mes")
 @NoArgsConstructor
-public class SelicMes {
+public class IndiceSelicAPI {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -29,13 +26,13 @@ public class SelicMes {
     BigDecimal valor;
 
 
-    public SelicMes(LocalDate data, BigDecimal valor) {
+    public IndiceSelicAPI(LocalDate data, BigDecimal valor) {
         this.data = data;
         this.valor = new BigDecimal(valor.toString());
     }
 
     @JsonCreator
-    public SelicMes(@JsonProperty("data") String dataString, @JsonProperty("valor") BigDecimal valor) {
+    public IndiceSelicAPI(@JsonProperty("data") String dataString, @JsonProperty("valor") BigDecimal valor) {
         this.data = converterDataString(dataString);
         this.valor = new BigDecimal(valor.toString());
     }

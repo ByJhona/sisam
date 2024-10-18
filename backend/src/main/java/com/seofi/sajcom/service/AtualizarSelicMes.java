@@ -1,7 +1,7 @@
 package com.seofi.sajcom.service;
 
-import com.seofi.sajcom.domain.Indices;
-import com.seofi.sajcom.domain.SelicMes;
+import com.seofi.sajcom.domain.Indice;
+import com.seofi.sajcom.domain.IndiceSelicAPI;
 import com.seofi.sajcom.domain.Tipo;
 import com.seofi.sajcom.repository.IndiceRepository;
 import com.seofi.sajcom.repository.TipoRepository;
@@ -35,17 +35,17 @@ public class AtualizarSelicMes {
     @Transactional
     public void filtrarIndicesSelic() {
 
-        List<SelicMes> indicesAPI = bacenAPI.getIndices();
-        List<Indices> novosIndices = new ArrayList<>();
+        List<IndiceSelicAPI> indicesAPI = bacenAPI.getIndices();
+        List<Indice> novosIndices = new ArrayList<>();
         Tipo tipoMes = this.util.buscarTipo(EnumTipo.Mes.obterTipo());
-        List<Indices>  indicesDoBanco = indiceRepo.buscarIndices(tipoMes);
+        List<Indice>  indicesDoBanco = indiceRepo.buscarIndices(tipoMes);
 
-        for (SelicMes indice : indicesAPI) {
+        for (IndiceSelicAPI indice : indicesAPI) {
             LocalDate dataIndice = indice.getData();
             boolean existeNoBanco = verificarExisteNoBanco(indicesDoBanco, indice);
             if (!existeNoBanco && dataInicialSelicRef.isBefore(dataIndice) && dataFinalSelicRef.isAfter(dataIndice)) {
                 BigDecimal valor = indice.getValor().setScale(6, RoundingMode.HALF_UP);
-                Indices novoSelicMes = new Indices(indice.getData(), valor, tipoMes);
+                Indice novoSelicMes = new Indice(indice.getData(), valor, tipoMes);
                 novosIndices.add(novoSelicMes);
             }
         }
@@ -55,7 +55,7 @@ public class AtualizarSelicMes {
 
         System.out.println("Selic mes atualizada.");
     }
-    private boolean verificarExisteNoBanco(List<Indices> indicesDoBanco, SelicMes indice) {
+    private boolean verificarExisteNoBanco(List<Indice> indicesDoBanco, IndiceSelicAPI indice) {
         return indicesDoBanco.stream().anyMatch(indiceDoBanco -> indiceDoBanco.getData().isEqual(indice.getData()));
     }
 }
