@@ -1,6 +1,7 @@
 package com.seofi.sajcom.service;
 
 import com.seofi.sajcom.domain.*;
+import com.seofi.sajcom.exception.IntervaloDatasInvalido;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -89,6 +90,10 @@ public class CalculadoraService {
     private BigDecimal calculoValorSelicAcumulada(LocalDate dataInicial, LocalDate dataFinal, BigDecimal valor) {
         Indice indiceInicial = util.buscarIndice(dataInicial, EnumTipo.Acumulada);
         Indice indiceFinal = util.buscarIndice(dataFinal, EnumTipo.Acumulada);
+
+        if(indiceInicial == null || indiceFinal == null){
+            throw new IntervaloDatasInvalido("Índices não poem ser nulos.");
+        }
 
         return calcularValoresSelicAcumulada(valor, indiceInicial, indiceFinal);
     }
