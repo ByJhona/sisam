@@ -21,10 +21,10 @@ public class CalculadoraService {
     private static final BigDecimal CEM = BigDecimal.valueOf(100);
 
 
-    public DividaCalculadaDTO calcularDivida(Divida divida) {
-        LocalDate dataInicial = divida.getDataInicial();
-        LocalDate dataFinal = divida.getDataFinal();
-        BigDecimal valor = divida.getValor();
+    public DividaCalculadaDTO calcularDivida(DividaDTO divida) {
+        LocalDate dataInicial = divida.dataInicial();
+        LocalDate dataFinal = divida.dataFinal();
+        BigDecimal valor = divida.valor();
         BigDecimal valorTotalCalculado = calcularMontanteTotal(dataInicial, dataFinal, valor);
         List<IndiceDTO> indices = buscarIndices(dataInicial, dataFinal);
         return new DividaCalculadaDTO(valor, valorTotalCalculado, dataInicial, dataFinal, indices);

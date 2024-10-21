@@ -1,12 +1,9 @@
 package com.seofi.sajcom.controller;
 
-import com.seofi.sajcom.domain.Divida;
 import com.seofi.sajcom.domain.DividaCalculadaDTO;
+import com.seofi.sajcom.domain.DividaDTO;
 import com.seofi.sajcom.service.CalculadoraService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +19,7 @@ public class CalculadoraController {
 
     @GetMapping("calcular")
     public ResponseEntity<DividaCalculadaDTO> mostrarResultado(@RequestParam  BigDecimal valor, @RequestParam  LocalDate dataInicial, @RequestParam  LocalDate dataFinal) throws IOException {
-        Divida divida = new Divida(valor, dataInicial, dataFinal);
+        DividaDTO divida = new DividaDTO(valor, dataInicial, dataFinal);
         DividaCalculadaDTO dividaCalculadaDTO = this.calculadoraServ.calcularDivida(divida);
         return ResponseEntity.ok().body(dividaCalculadaDTO);
     }
