@@ -1,6 +1,6 @@
 package com.seofi.sajcom.service;
 
-import com.seofi.sajcom.domain.SelicMes;
+import com.seofi.sajcom.domain.IndiceSelicAPI;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -18,8 +18,8 @@ public class BacenAPI {
     }
 
     @Retryable(retryFor = UnsupportedMediaTypeException.class, maxAttempts = 5,  backoff = @Backoff(delay = 1000))
-    public List<SelicMes> getIndices() {
-        return this.client.get().uri("/dados/serie/bcdata.sgs.4390/dados?formato=json").header("Accept", "application/json").retrieve().bodyToMono(new ParameterizedTypeReference<List<SelicMes>>() {
+    public List<IndiceSelicAPI> getIndices() {
+        return this.client.get().uri("/dados/serie/bcdata.sgs.4390/dados?formato=json").header("Accept", "application/json").retrieve().bodyToMono(new ParameterizedTypeReference<List<IndiceSelicAPI>>() {
         }).block();
     }
 }

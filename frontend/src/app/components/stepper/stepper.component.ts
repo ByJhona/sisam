@@ -7,10 +7,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { NgxMaskDirective } from 'ngx-mask';
 import { Divida } from '../../types/divida';
+import enumTipo from '../../types/enumTipo';
+
 import { CalculadoraAPIService } from '../../service/calculadora-api.service';
 import { Indice } from '../../types/Indice';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatPaginator } from '@angular/material/paginator';
 import { DividaCalculada } from '../../types/dividaCalculada';
 import { meses } from '../../util/meses';
@@ -19,6 +21,9 @@ import { CardComponent } from "../card/card.component";
 import { formatarMesAno } from '../../util/manipularData';
 import { MatIcon } from '@angular/material/icon';
 import { LoadingService } from '../../service/loading.service';
+import { MatTabsModule } from '@angular/material/tabs';
+import { TabelaComponent } from "../tabela/tabela.component";
+
 
 @Component({
   selector: 'app-stepper',
@@ -27,8 +32,7 @@ import { LoadingService } from '../../service/loading.service';
     FormsModule, ReactiveFormsModule,
     MatFormFieldModule, MatInputModule,
     MatSelectModule, NgxMaskDirective,
-    MatTableModule, MatPaginator,
-    CardComponent, MatIcon, MatProgressBarModule],
+    CardComponent, MatIcon, MatProgressBarModule, MatTabsModule, TabelaComponent],
 
   templateUrl: './stepper.component.html',
   styleUrl: './stepper.component.scss'
@@ -42,15 +46,19 @@ export class StepperComponent {
     isEtapa3: false
   }
   //
-isLoading = false;
+  isLoading = false;
   anos: number[] = gerarAnos()
   meses = meses
   dataInicial: string = ""
   dataFinal: string = ""
-  displayedColumns: string[] = ['data', 'valor'];
-  dataSource = new MatTableDataSource<Indice>();
+
+  indices: Indice[] = []
+  indicesSelicAcumulada: Indice[] = []
+  indicesFatorAtualizacao: Indice[] = []
+  indicesFatorIndice: Indice[] = []
+
   dividaCalculada: DividaCalculada = new DividaCalculada();
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
   infoDivida = this._formBuilder.group({
     valor: ['', Validators.required],
     mesInicial: ['', Validators.required],
@@ -59,18 +67,16 @@ isLoading = false;
     anoFinal: ['', [Validators.required]]
   }, { validators: this.dataFinalMenorDataFinal() });
 
-  constructor(private calculadoraService: CalculadoraAPIService, private _formBuilder: FormBuilder,private cd: ChangeDetectorRef, public loadingService: LoadingService) {
+  constructor(private calculadoraService: CalculadoraAPIService, private _formBuilder: FormBuilder, private cd: ChangeDetectorRef, public loadingService: LoadingService) {
 
   }
-  ngOnInit(){
+  ngOnInit() {
     this.loadingService.isLoading$.subscribe(estado => {
       this.isLoading = estado;
     })
   }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-  }
+
   toggleCampos(enable: boolean) {
     const fields = ['valor', 'mesInicial', 'anoInicial', 'mesFinal', 'anoFinal'];
     fields.forEach(field => enable ? this.infoDivida.get(field)?.enable() : this.infoDivida.get(field)?.disable());
@@ -90,7 +96,7 @@ isLoading = false;
       var divida: Divida = this.construirObjetoDivida();
       this.enviarApi(divida, stepper);
       this.toggleCampos(false);
-      
+
 
     }
   }
@@ -141,9 +147,11 @@ isLoading = false;
     return divida;
   }
 
-  enviarApi(divida: Divida, stepper:MatStepper): void {
+  enviarApi(divida: Divida, stepper: MatStepper): void {
     this.calculadoraService.enviarDados(divida).subscribe((result) => {
-      this.dataSource.data = result.indices;
+      //this.dataSource.data = result.indices;
+      this.atribuirIndices(result.indices)
+
       this.dividaCalculada = new DividaCalculada(result.valorInicial, result.valorFinal, result.dataInicial, result.dataFinal, result.indices);
 
       this.dataInicial = formatarMesAno(this.dividaCalculada.dataInicial)
@@ -153,6 +161,12 @@ isLoading = false;
       this.cd.detectChanges();
       stepper.next();  // Avançar para a próxima etapa
     })
+  }
+
+  atribuirIndices(indices: Indice[]) {
+    this.indicesSelicAcumulada = indices.filter((indice) => indice.tipo == enumTipo.Acumulada)
+    this.indicesFatorAtualizacao = indices.filter((indice) => indice.tipo == enumTipo.Atualizacao)
+    this.indicesFatorIndice = indices.filter((indice) => indice.tipo == enumTipo.Indice)
   }
 
   gerarRelatorio(stepper: MatStepper) {
