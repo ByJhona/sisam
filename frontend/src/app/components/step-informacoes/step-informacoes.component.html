@@ -1,0 +1,16 @@
+<div class="info-valores">
+  <app-card titulo="Valor inicial" [valor]="dividaCalculada.obterValorInicial()"></app-card>
+  <app-card titulo="Dívida calculada" [valor]="dividaCalculada.obterValorFinal()"></app-card>
+</div>
+
+<div class="info-tabela">
+  <h6 class="titulo">Tabela de índices</h6>
+  <p class="legenda"> {{dataInicial}} até {{dataFinal}}</p>
+</div>
+
+
+
+<div class="bnt">
+  <button class="bnt-preenchido" type="buttom">Gerar Relatório</button>
+  <button class="bnt-outline">Voltar</button>
+</div>

@@ -15,14 +15,16 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatPaginator } from '@angular/material/paginator';
 import { DividaCalculada } from '../../types/dividaCalculada';
-import { meses } from '../../util/meses';
+import { mesesGerados } from '../../util/meses';
 import { gerarAnos } from '../../util/anos';
 import { CardComponent } from "../card/card.component";
 import { formatarMesAno } from '../../util/manipularData';
 import { MatIcon } from '@angular/material/icon';
 import { LoadingService } from '../../service/loading.service';
 import { MatTabsModule } from '@angular/material/tabs';
-import { TabelaComponent } from "../tabela/tabela.component";
+import { StepDadosComponent } from "../step-dados/step-dados.component";
+import { StepInformacoesComponent } from "../step-informacoes/step-informacoes.component";
+import { StepRelatorioComponent } from "../step-relatorio/step-relatorio.component";
 
 
 @Component({
@@ -32,13 +34,14 @@ import { TabelaComponent } from "../tabela/tabela.component";
     FormsModule, ReactiveFormsModule,
     MatFormFieldModule, MatInputModule,
     MatSelectModule, NgxMaskDirective,
-    CardComponent, MatIcon, MatProgressBarModule, MatTabsModule, TabelaComponent],
+    CardComponent, MatIcon, MatProgressBarModule, MatTabsModule, StepDadosComponent, StepInformacoesComponent, StepRelatorioComponent],
 
   templateUrl: './stepper.component.html',
   styleUrl: './stepper.component.scss'
 })
 export class StepperComponent {
   documentoBinario: Blob = new Blob();
+  dividaCalculada!:DividaCalculada
   // Variaveis para controle das etapas
   etapas = {
     isEtapa1: false,
@@ -47,127 +50,18 @@ export class StepperComponent {
   }
   //
   isLoading = false;
-  anos: number[] = gerarAnos()
-  meses = meses
-  dataInicial: string = ""
-  dataFinal: string = ""
+ 
+ 
 
-  indices: Indice[] = []
-  indicesSelicAcumulada: Indice[] = []
-  indicesFatorAtualizacao: Indice[] = []
-  indicesFatorIndice: Indice[] = []
-
-  dividaCalculada: DividaCalculada = new DividaCalculada();
-
-  infoDivida = this._formBuilder.group({
-    valor: ['', Validators.required],
-    mesInicial: ['', Validators.required],
-    anoInicial: ['', Validators.required],
-    mesFinal: ['', Validators.required],
-    anoFinal: ['', [Validators.required]]
-  }, { validators: this.dataFinalMenorDataFinal() });
-
-  constructor(private calculadoraService: CalculadoraAPIService, private _formBuilder: FormBuilder, private cd: ChangeDetectorRef, public loadingService: LoadingService) {
-
-  }
-  ngOnInit() {
-    this.loadingService.isLoading$.subscribe(estado => {
-      this.isLoading = estado;
-    })
-  }
-
-
-  toggleCampos(enable: boolean) {
-    const fields = ['valor', 'mesInicial', 'anoInicial', 'mesFinal', 'anoFinal'];
-    fields.forEach(field => enable ? this.infoDivida.get(field)?.enable() : this.infoDivida.get(field)?.disable());
-  }
-
-  limparCampos(stepper: MatStepper): void {
-    stepper.reset();
-    this.toggleCampos(true);
-    this.etapas.isEtapa1 = false;
-    this.etapas.isEtapa2 = false;
-    this.etapas.isEtapa3 = false;
-    this.infoDivida.reset();
-  }
-
-  onSubmit(stepper: MatStepper) {
-    if (this.validarDivida()) {
-      var divida: Divida = this.construirObjetoDivida();
-      this.enviarApi(divida, stepper);
-      this.toggleCampos(false);
-
-
-    }
-  }
-
-  dataFinalMenorDataFinal(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const { mesInicial, anoInicial, mesFinal, anoFinal } = control.value;
-
-      if (mesInicial && anoInicial && mesFinal && anoFinal) {
-        const dataInicial = new Date(anoInicial, mesInicial - 1, 1); // Mês é baseado em 0 (janeiro = 0)
-        const dataFinal = new Date(anoFinal, mesFinal - 1, 1);
-        if (dataFinal < dataInicial) {
-          control.get('anoFinal')?.setErrors({ dataFinalMenor: true })
-          return { dataFinalMenor: true };
-        }
-      }
-      control.get('anoFinal')?.updateValueAndValidity({ onlySelf: true })
-      return null;
-    }
+  constructor(private calculadoraService: CalculadoraAPIService, public loadingService: LoadingService) {
 
   }
 
-  validarDivida(): boolean {
-    if (this.infoDivida.valid) { // Se o formulario estiver válido...
-      return true;
-    } else {
-      // Criar modal de alerta
-      alert("Dados informados inválidos!")
-      return false;
-    }
+  receberRespostaAPI(dividaCalculada:DividaCalculada){
+    this.dividaCalculada = dividaCalculada;
+    console.log(this.dividaCalculada)
   }
 
-  construirObjetoDivida(): Divida {
-    var valor = Number(this.infoDivida.get('valor')?.value);
-    var mesInicial = Number(this.infoDivida.get('mesInicial')?.value);
-    var anoInicial = Number(this.infoDivida.get('anoInicial')?.value);
-    var mesFinal = Number(this.infoDivida.get('mesFinal')?.value);
-    var anoFinal = Number(this.infoDivida.get('anoFinal')?.value);
-    var dataInicial = new Date(anoInicial, mesInicial - 1);
-    var dataFinal = new Date(anoFinal, mesFinal - 1)
-
-    var divida: Divida = {
-      valor: valor,
-      dataInicial: dataInicial,
-      dataFinal: dataFinal
-    }
-
-    return divida;
-  }
-
-  enviarApi(divida: Divida, stepper: MatStepper): void {
-    this.calculadoraService.enviarDados(divida).subscribe((result) => {
-      //this.dataSource.data = result.indices;
-      this.atribuirIndices(result.indices)
-
-      this.dividaCalculada = new DividaCalculada(result.valorInicial, result.valorFinal, result.dataInicial, result.dataFinal, result.indices);
-
-      this.dataInicial = formatarMesAno(this.dividaCalculada.dataInicial)
-      this.dataFinal = formatarMesAno(this.dividaCalculada.dataFinal)
-      this.etapas.isEtapa1 = true
-      this.etapas.isEtapa2 = true
-      this.cd.detectChanges();
-      stepper.next();  // Avançar para a próxima etapa
-    })
-  }
-
-  atribuirIndices(indices: Indice[]) {
-    this.indicesSelicAcumulada = indices.filter((indice) => indice.tipo == enumTipo.Acumulada)
-    this.indicesFatorAtualizacao = indices.filter((indice) => indice.tipo == enumTipo.Atualizacao)
-    this.indicesFatorIndice = indices.filter((indice) => indice.tipo == enumTipo.Indice)
-  }
 
   gerarRelatorio(stepper: MatStepper) {
     this.etapas.isEtapa3 = true

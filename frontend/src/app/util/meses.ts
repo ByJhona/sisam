@@ -1,4 +1,4 @@
-export const meses = [
+export const mesesGerados = [
     { "nome": "Janeiro", "valor": 1 },
     { "nome": "Fevereiro", "valor": 2 },
     { "nome": "Março", "valor": 3 },

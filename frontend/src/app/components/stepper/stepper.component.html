@@ -3,148 +3,30 @@
 <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }
 
-<mat-stepper linear="true" #stepper>
+<mat-stepper linear="false" #stepper>
 
   <mat-step label="Informações" [completed]="etapas.isEtapa1">
     <ng-template matStepperIcon="edit">
       <mat-icon>check</mat-icon>
     </ng-template>
-    <form [formGroup]="infoDivida">
-      <div class="container-input">
-        <h2 class="label">Valor da dívida:</h2>
-        <div class="data">
-          <mat-form-field appearance="outline">
-            <span matTextPrefix>R$ &nbsp;</span>
-            <input matInput formControlName="valor" required [specialCharacters]="[ ',', '.' ]" mask="separator.2"
-              thousandSeparator="." placeholder="Valor em reais">
-            <mat-hint align="start">Use vírgula para os centavos</mat-hint>
-            @if (!infoDivida.hasError('required')) {
-            <mat-error>Insira um valor válido!</mat-error>
-            }
-          </mat-form-field>
-        </div>
-      </div>
-
-      <div class="container-input">
-        <h2 class="label">Data de início:</h2>
-        <div class="data">
-          <mat-form-field appearance="outline">
-            <mat-select placeholder="Selecione o mês" formControlName="mesInicial">
-              @for (mes of meses; track mes) {
-              <mat-option [value]="mes.valor">{{mes.nome}}</mat-option>
-              }
-            </mat-select>
-            @if (!infoDivida.hasError('required')) {
-            <mat-error>Insira o mês!</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-select placeholder="Selecione o ano" formControlName="anoInicial">
-              @for (ano of anos; track ano) {
-              <mat-option [value]="ano">{{ano}}</mat-option>
-              }
-            </mat-select>
-            @if (!infoDivida.hasError('required')) {
-            <mat-error>Insira o ano!</mat-error>
-            }
-          </mat-form-field>
-        </div>
-      </div>
-
-      <div class="container-input">
-        <h2 class="label">Data de término:</h2>
-        <div class="data">
-          <mat-form-field appearance="outline">
-            <mat-select placeholder="Selecione o mês" formControlName="mesFinal">
-              @for (mes of meses; track mes) {
-              <mat-option [value]="mes.valor">{{mes.nome}}</mat-option>
-              }
-            </mat-select>
-            @if (!infoDivida.hasError('required')) {
-            <mat-error>Insira o mês!</mat-error>
-            }
-
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-select placeholder="Selecione o ano" formControlName="anoFinal">
-              @for (ano of anos; track ano) {
-              <mat-option [value]="ano">{{ano}}</mat-option>
-              }
-            </mat-select>
-            @if (infoDivida.hasError('dataFinalMenor')) {
-            <mat-error>Data final inválida!</mat-error>
-            }@else if(!infoDivida.hasError('required')){
-            <mat-error>Insira o ano!</mat-error>
-            }
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="bnt">
-        <button class="bnt-preenchido" (click)="onSubmit(stepper)" type="submit">Calcular</button>
-        <button class="bnt-outline" (click)="limparCampos(stepper)">Limpar</button>
-      </div>
-    </form>
+    <app-step-dados (respostaApi)="receberRespostaAPI($event)"></app-step-dados>
   </mat-step>
 
   <mat-step label="Índices" [completed]="etapas.isEtapa2">
     <ng-template matStepperIcon="edit">
       <mat-icon>check</mat-icon>
     </ng-template>
-    <div class="info-valores">
-      <app-card titulo="Valor inicial" [valor]="dividaCalculada.getValorInicial()"></app-card>
-      <app-card titulo="Dívida calculada" [valor]="dividaCalculada.getValorFinal()"></app-card>
-    </div>
-    <div class="info-tabela">
-      <h6 class="titulo">Tabela de índices</h6>
-      <p class="legenda"> {{dataInicial}} até {{dataFinal}}</p>
-    </div>
 
+    @if(dividaCalculada != undefined){
+    <app-step-informacoes [dividaCalculada]="dividaCalculada"></app-step-informacoes>
+    }
 
-
-
-
-    <mat-tab-group>
-      <mat-tab label="Selic">
-        @if (indicesSelicAcumulada.length != 0) {
-        <app-tabela [indices]="indicesSelicAcumulada"></app-tabela>
-        }
-      </mat-tab>
-
-      @if (indicesFatorAtualizacao.length != 0 && indicesFatorIndice.length != 0) {
-      <mat-tab label="Fator Atualização">
-        <app-tabela [indices]="indicesFatorAtualizacao"></app-tabela>
-      </mat-tab>
-      <mat-tab label="Fator Índice">
-        <app-tabela [indices]="indicesFatorIndice"></app-tabela>
-      </mat-tab>
-
-      }
-
-    </mat-tab-group>
-
-
-
-
-
-
-
-    <div class="bnt">
-      <button class="bnt-preenchido" (click)="gerarRelatorio(stepper)" type="buttom">Gerar Relatório</button>
-      <button class="bnt-outline" (click)="stepper.previous()">Voltar</button>
-    </div>
   </mat-step>
 
   <mat-step label="Relatório (PDF)">
     <ng-template matStepperIcon="edit">
       <mat-icon>check</mat-icon>
     </ng-template>
-    <p>Tabela de Atualização Monetária </p>
-    <div class="bnt">
-      <button class="bnt-preenchido" (click)="baixarRelatorio()" type="buttom">Baixar Relatório (PDF)</button>
-      <button class="bnt-outline" (click)="limparCampos(stepper)">Novo Calculo</button>
-      <button class="bnt-outline" (click)="stepper.previous()">Voltar</button>
-    </div>
+    <app-step-relatorio></app-step-relatorio>
   </mat-step>
 </mat-stepper>

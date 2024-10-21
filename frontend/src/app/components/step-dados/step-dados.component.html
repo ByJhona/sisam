@@ -1,0 +1,77 @@
+<form [formGroup]="infoDivida" (ngSubmit)="onSubmit()">
+  <div class="container-input">
+    <h2 class="label">Valor da dívida:</h2>
+    <div class="data">
+      <mat-form-field appearance="outline">
+        <span matTextPrefix>R$ &nbsp;</span>
+        <input matInput formControlName="valor" required [specialCharacters]="[ ',', '.' ]" mask="separator.2"
+          thousandSeparator="." placeholder="Valor em reais">
+        <mat-hint align="start">Use vírgula para os centavos</mat-hint>
+        @if (!infoDivida.hasError('required')) {
+        <mat-error>Insira um valor válido!</mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="container-input">
+    <h2 class="label">Data de início:</h2>
+    <div class="data">
+      <mat-form-field appearance="outline">
+        <mat-select placeholder="Selecione o mês" formControlName="mesInicial">
+          @for (mes of meses; track mes) {
+          <mat-option [value]="mes.valor">{{mes.nome}}</mat-option>
+          }
+        </mat-select>
+        @if (!infoDivida.hasError('required')) {
+        <mat-error>Insira o mês!</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-select placeholder="Selecione o ano" formControlName="anoInicial">
+          @for (ano of anos; track ano) {
+          <mat-option [value]="ano">{{ano}}</mat-option>
+          }
+        </mat-select>
+        @if (!infoDivida.hasError('required')) {
+        <mat-error>Insira o ano!</mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="container-input">
+    <h2 class="label">Data de término:</h2>
+    <div class="data">
+      <mat-form-field appearance="outline">
+        <mat-select placeholder="Selecione o mês" formControlName="mesFinal">
+          @for (mes of meses; track mes) {
+          <mat-option [value]="mes.valor">{{mes.nome}}</mat-option>
+          }
+        </mat-select>
+        @if (!infoDivida.hasError('required')) {
+        <mat-error>Insira o mês!</mat-error>
+        }
+
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-select placeholder="Selecione o ano" formControlName="anoFinal">
+          @for (ano of anos; track ano) {
+          <mat-option [value]="ano">{{ano}}</mat-option>
+          }
+        </mat-select>
+        @if (infoDivida.hasError('dataFinalMenor')) {
+        <mat-error>Data final inválida!</mat-error>
+        }@else if(!infoDivida.hasError('required')){
+        <mat-error>Insira o ano!</mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="bnt">
+    <app-botao estilo="bnt-preenchido" label="Calcular" tipo="submit"></app-botao>
+    <app-botao estilo="bnt-outline" label="Limpar"> </app-botao>
+  </div>
+</form>

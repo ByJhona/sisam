@@ -1,0 +1,32 @@
+form {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: 1rem;
+
+    .container-input {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 60%;
+        height: 100%;
+        margin: .5rem 0 .5rem 0;
+
+        .label {
+            font-size: 1rem;
+        }
+
+
+        .data {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 60%;
+
+            mat-form-field {
+                margin: 0 .5rem 0 .5rem;
+            }
+        }
+
+    }
+}
